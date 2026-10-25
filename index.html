@@ -4148,7 +4148,7 @@ function matchDraw(){
     else if(a<.12)psp=drawRigActor(g,M.p,M.pDef,'back','near',P_FOOT,M.pdx,'idle',0);
     else if(a<.22){const sp=rigSprite(M.pDef,'front','near','idle',0);g.drawImage(silhouette(sp.img),x-sp.w/4,P_FOOT-sp.fy/2,sp.w/2,sp.h/2);}
     else{const fi=Math.floor((a-.22)*RFPS);psp=drawRigActor(g,M.p,M.pDef,'front','near',P_FOOT,M.pdx,ce.anim,fi);}}
-  else if(M.state==='end'||M.state==='done'){if(M.won){const wa=winAnimOf(M.pl.look);const fi=Math.floor(now*RFPS);psp=drawRigActor(g,M.p,M.pDef,'front','near',P_FOOT,M.pdx,wa,fi);}else psp=drawRigActor(g,M.p,M.pDef,'back','near',P_FOOT,M.pdx);}
+  else if(M.state==='end'||M.state==='done'){if(M.won){const ea=now-(M.tEnd||now);const pup=typeof pupOn==='function'&&pupOn(M.pDef,'back');const wa=ea<.55?(pup?'hop':winAnimOf(M.pl.look)):(pup?'idle':winAnimOf(M.pl.look));psp=drawRigActor(g,M.p,M.pDef,'back','near',P_FOOT,M.pdx,wa,Math.floor(ea*RFPS));}else psp=drawRigActor(g,M.p,M.pDef,'back','near',P_FOOT,M.pdx);}
   else if(M.hd&&M.state==='rally'){const L=occLayer(g);psp=drawRigActor(L,M.p,M.pDef,'back','near',P_FOOT,M.pdx);occFlush(g,L,b&&bp&&bp.v<.55?{x:bp.x,y:bp.y-bp.h*hkOf(bp.v),v:bp.v}:null,b);}
   else psp=drawRigActor(g,M.p,M.pDef,'back','near',P_FOOT,M.pdx);
   ringFx();
@@ -5689,7 +5689,7 @@ function fanDefsB(k){const key='defs|'+k;let D=FANS_B.get(key);if(D)return D;con
   for(const d of D)pxrWarm(d,'front','far',['idle']);setTimeout(()=>{for(const d of D)pxrWarm(d,'front','far',FAN_ANIMS.slice(1));},400);
   FANS_B.set(key,D);return D;}
 function fansOfB(k){const key=k+'|'+CAMB.barTop.toFixed(1);let L=FANS_B.get(key);if(L)return L;const R=rng(k.length*131+7);const D=fanDefsB(k);L=[];
-  for(let x=-50;x<212;x+=7+R()*4){if(R()<.15)continue;L.push({x:x+R()*2,s:.92+R()*.16,ph:R()*6.28,sp:.7+R()*.7,d:D[Math.floor(R()*D.length)],ch:{x:0,anim:'idle',at:0},fav:FAN_ANIMS[1+Math.floor(R()*3)],hot:R()<.5?'win':R()<.5?'hop':'roar',row:R()<.35?1:0});}
+  for(let x=-50;x<212;x+=11+R()*6){if(R()<.15)continue;L.push({x:x+R()*2,s:.92+R()*.16,ph:R()*6.28,sp:.7+R()*.7,d:D[Math.floor(R()*D.length)],ch:{x:0,anim:'idle',at:0},fav:FAN_ANIMS[1+Math.floor(R()*3)],hot:R()<.5?'win':R()<.5?'hop':'roar',row:R()<.35?1:0});}
   L.sort((a,b)=>b.row-a.row);FANS_B.set(key,L);return L;}
 function fanFrame(d,anim,t){const i=pxFrameAt(anim,t);const idx=i<0?0:i;let r=pxrGet(d,'front','far',anim,idx);if(r)return r;pxrQueue(d,'front','far',anim,idx);r=pxrGet(d,'front','far','idle',0);if(!r)pxrQueue(d,'front','far','idle',0);return r;}
 function drawFansB(g,k,t,hype,wv){const src=arenaSrcB(k);if(!src||!(src.mode==='bg'||src.mode==='train'))return;if(typeof pxrGet!=='function')return;const L=fansOfB(k);
@@ -5699,7 +5699,7 @@ function drawFansB(g,k,t,hype,wv){const src=arenaSrcB(k);if(!src||!(src.mode==='
     if(hype>1.4||near)anim=f.hot;else if(cy<1.3)anim=f.fav;
     if(f.ch.anim!==anim){f.ch.anim=anim;f.ch.at=t;}
     const r=fanFrame(f.d,anim,Math.max(0,t-f.ch.at));if(!r)continue;
-    const sc=s*1.6*.42*f.s/natH*(f.row?.86:1);const foot=bt+natH*sc*.52-(f.row?natH*sc*.16:0);const w=r.w*sc,h=r.h*sc;
+    const sc=s*1.6*.78*f.s/natH*(f.row?.88:1);const foot=bt+natH*sc*.52-(f.row?natH*sc*.16:0);const w=r.w*sc,h=r.h*sc;
     g.drawImage(r.img,f.x-w/2,foot-r.fy*sc,w,h);}
   g.restore();
   // 득점 색종이 (홈 관중 쪽 득점 직후 2초)
@@ -6526,7 +6526,7 @@ function hudBottomL(){const hud=$('#play .hud');const r=cv.getBoundingClientRect
 function txtOut(g,s,x,y,px,col,al='left',font=FONT_D){g.font=`${px}px ${font}`;g.textAlign=al;g.textBaseline='alphabetic';g.lineJoin='round';g.lineWidth=px*.28;g.strokeStyle='#05040f';g.strokeText(s,x,y);g.fillStyle=col;g.fillText(s,x,y);}
 const easeO=p=>1-Math.pow(1-clamp(p,0,1),3);
 {const _sc=startCeleb;startCeleb=function(why){_sc.apply(this,arguments);try{const el=$('#celeb');el.hidden=true;clearTimeout(startCeleb.tm);}catch(e){}
-  if(!M||!M.celeb)return;M.celeb.why=why;M.celeb.fx=(why==='game'||why==='special')?'cut':'jumbo';M.celeb.src=celebSrc();if(M.celeb.fx==='cut')sfx('cut-in');};
+  if(!M||!M.celeb)return;M.celeb.why=why;M.celeb.fx=(why==='game'||why==='special'||why==='win')?'cut':'jumbo';M.celeb.src=celebSrc();if(M.celeb.fx==='cut')sfx('cut-in');};
   startCeleb.tm=0;}
 {const _sm=startMatch;startMatch=function(){const out=_sm.apply(this,arguments);try{const A=artBIOf(M.pDef.who);if(A&&A.seqDef&&A.seqDef.win)ensureSeq(A,'win');}catch(e){}return out;};}
 function drawCelebFx(g,W,H){const ce=M&&M.celeb;if(!ce||!ce.src)return;const a=CLOCK-ce.t0;const city=CITY[S.city]||CITY.seoul;const col=uniMe().c||city.c;
@@ -6541,7 +6541,7 @@ function drawCelebFx(g,W,H){const ce=M&&M.celeb;if(!ce||!ce.src)return;const a=C
     const iw=bh*.92,ix=W*.5-iw*.05;celebBlit(g,ce.src,a,ix,top,iw*1.05,bh,1+a*.06);
     const fg=g.createLinearGradient(ix,0,ix+iw*.35,0);fg.addColorStop(0,mixc(col,'#051766',.35));fg.addColorStop(1,'rgba(5,23,102,0)');g.fillStyle=fg;g.fillRect(ix-1,top,iw*.35,bh);g.restore();
     g.strokeStyle='#ffffff';g.lineWidth=1.4;g.stroke();g.strokeStyle='#05040f';g.lineWidth=.6;g.stroke();
-    const tx=10+sl*.4;txtOut(g,ce.why==='game'?'GAME!':'SPECIAL!',tx,top+bh*.36,Math.round(bh*.2),'#ffd23f','left',FONT_N);
+    const tx=10+sl*.4;txtOut(g,ce.why==='win'?'VICTORY!':ce.why==='game'?'GAME!':'SPECIAL!',tx,top+bh*.36,Math.round(bh*.2),'#ffd23f','left',FONT_N);
     txtOut(g,M.pl.name,tx,top+bh*.62,Math.round(bh*.13),'#ffffff');txtOut(g,ce.line||'',tx,top+bh*.84,Math.max(6,Math.round(bh*.085)),'#bfe9ff');g.restore();return;}
   // 전광판 리플레이 (작은 창 · 2.4초)
   if(a>2.4)return;const ww=Math.round(W*.52),wh=Math.round(ww*.62),top=hudBottomL()+3;const pin=easeO(a/.22),pout=a>2.1?easeO((a-2.1)/.3):0;const y=top-(1-pin)*(wh+12)-pout*(wh+12),x=(W-ww)/2;
@@ -6549,16 +6549,18 @@ function drawCelebFx(g,W,H){const ce=M&&M.celeb;if(!ce||!ce.src)return;const a=C
   g.save();g.beginPath();g.rect(x,y,ww,wh);g.clip();g.fillStyle=mixc(col,'#051766',.5);g.fillRect(x,y,ww,wh);celebBlit(g,ce.src,a,x,y,ww,wh,1.04+a*.05);
   g.globalAlpha=.16;g.fillStyle='#000';for(let yy=y;yy<y+wh;yy+=1.2)g.fillRect(x,yy,ww,.5);g.globalAlpha=1;
   const vg=g.createRadialGradient(x+ww/2,y+wh/2,wh*.3,x+ww/2,y+wh/2,ww*.7);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.45)');g.fillStyle=vg;g.fillRect(x,y,ww,wh);g.restore();
-  if(Math.floor(a*3)%2===0){g.fillStyle='#ff3040';g.beginPath();g.arc(x+5,y+5,1.6,0,Math.PI*2);g.fill();}txtOut(g,'REPLAY',x+9,y+7.2,6,'#ffffff','left',FONT_N);
-  txtOut(g,ce.why==='combo'?'3RD BALL ATTACK':'NICE SHOT!',x+ww-3,y+wh-3,7,'#ffd23f','right',FONT_N);
+    txtOut(g,ce.why==='combo'?'3RD BALL ATTACK':'NICE SHOT!',x+ww-3,y+wh-3,7,'#ffd23f','right',FONT_N);
   g.font=`6px ${FONT_D}`;txtOut(g,(M.pl.name+' · '+(ce.line||'')).slice(0,22),x+ww/2,y+wh+8.5,5.5,'#ffffff','center');g.restore();}
 {const _md=matchDraw;matchDraw=function(){_md.apply(this,arguments);if(!M||!M.celeb)return;const g=ctx;g.save();g.setTransform(RES,0,0,RES,0,0);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
   try{drawCelebFx(g,cv.width/RES,cv.height/RES);}catch(e){diagLog(e,'celeb');}g.restore();};}
 
+// 경기 승리: 정면으로 돌아 방방 뛰던 연출 대신 뒷모습 한 번 점프 + VICTORY 컷인
+{const _pt=pointTo;pointTo=function(w){const out=_pt.apply(this,arguments);try{if(M&&M.state==='end'&&M.won&&!(M.celeb&&M.celeb.why==='win')){startCeleb('win');M.celeb.line=M.celeb.line||'승리!';}}catch(e){diagLog(e,'win-celeb');}return out;};}
+
 </script>
 
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202610252232').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202610252258').catch(()=>{});});}
 // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
 try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
 </script>
