@@ -6505,10 +6505,60 @@ function diagHTML(){const L=DIAG.list;return `<div class="diag box flat small"><
   const _b=bind;bind=function(){if(_b)_b.apply(this,arguments);const cl=$('#diagClr');if(cl)cl.onclick=()=>{DIAG.list=[];DIAG.seen.clear();try{localStorage.removeItem('pm.err');}catch(e){}const d=mbox.querySelector('.diag');if(d)d.innerHTML='<span class="lbl">오류 기록</span><div class="tiny muted">기록 없음</div>';};};}
   return _sm.call(this,html,bind,opt);};}
 
+/* ================= v17.3 · 세리머니: 돌아서지 않음 · 큰 순간 = 애니 컷인(B) · 작은 순간 = 전광판 리플레이(C) ================= */
+// 코트 위 선수는 뒷모습 그대로 점프 · 주먹 (종이 뒤집기 회전 제거)
+drawCelebTurn=function(g,a,ce,x){const def=M.pDef;const pup=typeof pupOn==='function'&&pupOn(def,'back');const an=pup?'hop':(ce.anim||'fist');
+  return drawRigActor(g,M.p,def,'back','near',P_FOOT,M.pdx,an,Math.floor(a*RFPS));};
+// 앞모습 소스: 승리 장면 영상 프레임 → 카드 원화 → 도트 엔진 앞모습 승리 동작
+function celebSrc(){const A=typeof artBIOf==='function'?artBIOf(M.pDef.who||artWho(M.pl)):null;
+  if(A){if(A.seqDef&&A.seqDef.win)ensureSeq(A,'win');const s=A.seq&&A.seq.win;if(s&&s.f&&s.f.length)return {kind:'seq',f:s.f,fps:s.fps||8,cy:[.06,.56]};
+    const c=imgOK(A.card)?A.card:imgOK(A.front)?A.front:null;if(c)return {kind:'img',im:c,cy:[0,.5]};}
+  return {kind:'pix',cy:[0,.62]};}
+function celebFrame(src,a){if(src.kind==='seq'){const im=src.f[Math.floor(a*src.fps)%src.f.length];return imgOK(im)?{im,w:im.naturalWidth,h:im.naturalHeight}:null;}
+  if(src.kind==='img')return {im:src.im,w:src.im.naturalWidth||src.im.width,h:src.im.naturalHeight||src.im.height};
+  const i=Math.max(0,pxFrameAt('win',a));const r=(typeof pxrGet==='function'&&(pxrGet(M.pDef,'front','near','win',i)||pxrGet(M.pDef,'front','near','win',0)))||null;if(!r){try{pxrQueue(M.pDef,'front','near','win',i);}catch(e){}return null;}
+  return {im:r.img,w:r.img.width,h:r.img.height,fy:r.fy/r.h};}
+// 사각 창에 앞모습을 채워 그림 (위쪽 상반신 위주 · 천천히 확대)
+function celebBlit(g,src,a,x,y,w,h,zoom){const fr=celebFrame(src,a);if(!fr)return;const [c0,c1]=src.cy;const sh=fr.h*(c1-c0);let sw=sh*w/h;let sx=(fr.w-sw)/2,sy=fr.h*c0;
+  if(sw>fr.w){sw=fr.w;const sh2=sw*h/w;sy=fr.h*c0;g.drawImage(fr.im,0,sy,sw,Math.min(sh2,fr.h-sy),x,y,w,h*Math.min(1,(fr.h-sy)/sh2));return;}
+  const z=1/zoom;const cw=sw*z,ch=sh*z;g.drawImage(fr.im,sx+(sw-cw)/2,sy+(sh-ch)*.3,cw,ch,x,y,w,h);}
+function hudBottomL(){const hud=$('#play .hud');const r=cv.getBoundingClientRect();if(!hud||!r.width)return 40;const s=r.width/(cv.width/RES);return clamp((hud.getBoundingClientRect().bottom-r.top)/s,20,90);}
+function txtOut(g,s,x,y,px,col,al='left',font=FONT_D){g.font=`${px}px ${font}`;g.textAlign=al;g.textBaseline='alphabetic';g.lineJoin='round';g.lineWidth=px*.28;g.strokeStyle='#05040f';g.strokeText(s,x,y);g.fillStyle=col;g.fillText(s,x,y);}
+const easeO=p=>1-Math.pow(1-clamp(p,0,1),3);
+{const _sc=startCeleb;startCeleb=function(why){_sc.apply(this,arguments);try{const el=$('#celeb');el.hidden=true;clearTimeout(startCeleb.tm);}catch(e){}
+  if(!M||!M.celeb)return;M.celeb.why=why;M.celeb.fx=(why==='game'||why==='special')?'cut':'jumbo';M.celeb.src=celebSrc();if(M.celeb.fx==='cut')sfx('cut-in');};
+  startCeleb.tm=0;}
+{const _sm=startMatch;startMatch=function(){const out=_sm.apply(this,arguments);try{const A=artBIOf(M.pDef.who);if(A&&A.seqDef&&A.seqDef.win)ensureSeq(A,'win');}catch(e){}return out;};}
+function drawCelebFx(g,W,H){const ce=M&&M.celeb;if(!ce||!ce.src)return;const a=CLOCK-ce.t0;const city=CITY[S.city]||CITY.seoul;const col=uniMe().c||city.c;
+  if(ce.fx==='cut'){if(a>1.5)return;
+    // 화면 번쩍 → 사선 띠가 오른쪽에서 들어와 머문 뒤 왼쪽으로 빠짐
+    if(a<.14){g.fillStyle=`rgba(255,255,255,${(.85*(1-a/.14)).toFixed(3)})`;g.fillRect(0,0,W,H);}
+    const top=hudBottomL()+6,bh=Math.min(H*.3,W*.62),sl=bh*.32;const pin=easeO((a-.06)/.16),pout=a>1.26?easeO((a-1.26)/.2):0;const ox=(1-pin)*(W+sl)-pout*(W+sl);
+    g.save();g.fillStyle=`rgba(3,6,24,${(.35*Math.min(pin,1-pout)).toFixed(3)})`;g.fillRect(0,0,W,H);
+    g.translate(ox,0);g.beginPath();g.moveTo(sl,top);g.lineTo(W+sl,top);g.lineTo(W,top+bh);g.lineTo(-sl,top+bh);g.closePath();
+    g.save();g.clip();const gr=g.createLinearGradient(0,top,W,top+bh);gr.addColorStop(0,'#051766');gr.addColorStop(.55,mixc(col,'#051766',.35));gr.addColorStop(1,col);g.fillStyle=gr;g.fillRect(-sl,top,W+2*sl,bh);
+    g.globalAlpha=.35;g.fillStyle='#ffffff';for(let i=0;i<18;i++){const yy=top+((i*37)%100)/100*bh,len=20+(i*13)%30,xx=((i*53+a*420)%(W+80))-40;g.fillRect(W-xx,yy,len,.6+(i%3)*.3);}g.globalAlpha=1;
+    const iw=bh*.92,ix=W*.5-iw*.05;celebBlit(g,ce.src,a,ix,top,iw*1.05,bh,1+a*.06);
+    const fg=g.createLinearGradient(ix,0,ix+iw*.35,0);fg.addColorStop(0,mixc(col,'#051766',.35));fg.addColorStop(1,'rgba(5,23,102,0)');g.fillStyle=fg;g.fillRect(ix-1,top,iw*.35,bh);g.restore();
+    g.strokeStyle='#ffffff';g.lineWidth=1.4;g.stroke();g.strokeStyle='#05040f';g.lineWidth=.6;g.stroke();
+    const tx=10+sl*.4;txtOut(g,ce.why==='game'?'GAME!':'SPECIAL!',tx,top+bh*.36,Math.round(bh*.2),'#ffd23f','left',FONT_N);
+    txtOut(g,M.pl.name,tx,top+bh*.62,Math.round(bh*.13),'#ffffff');txtOut(g,ce.line||'',tx,top+bh*.84,Math.max(6,Math.round(bh*.085)),'#bfe9ff');g.restore();return;}
+  // 전광판 리플레이 (작은 창 · 2.4초)
+  if(a>2.4)return;const ww=Math.round(W*.52),wh=Math.round(ww*.62),top=hudBottomL()+3;const pin=easeO(a/.22),pout=a>2.1?easeO((a-2.1)/.3):0;const y=top-(1-pin)*(wh+12)-pout*(wh+12),x=(W-ww)/2;
+  g.save();g.fillStyle='#0b0f22';g.fillRect(x-3,y-3,ww+6,wh+14);g.strokeStyle=col;g.lineWidth=1;g.strokeRect(x-3,y-3,ww+6,wh+14);
+  g.save();g.beginPath();g.rect(x,y,ww,wh);g.clip();g.fillStyle=mixc(col,'#051766',.5);g.fillRect(x,y,ww,wh);celebBlit(g,ce.src,a,x,y,ww,wh,1.04+a*.05);
+  g.globalAlpha=.16;g.fillStyle='#000';for(let yy=y;yy<y+wh;yy+=1.2)g.fillRect(x,yy,ww,.5);g.globalAlpha=1;
+  const vg=g.createRadialGradient(x+ww/2,y+wh/2,wh*.3,x+ww/2,y+wh/2,ww*.7);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.45)');g.fillStyle=vg;g.fillRect(x,y,ww,wh);g.restore();
+  if(Math.floor(a*3)%2===0){g.fillStyle='#ff3040';g.beginPath();g.arc(x+5,y+5,1.6,0,Math.PI*2);g.fill();}txtOut(g,'REPLAY',x+9,y+7.2,6,'#ffffff','left',FONT_N);
+  txtOut(g,ce.why==='combo'?'3RD BALL ATTACK':'NICE SHOT!',x+ww-3,y+wh-3,7,'#ffd23f','right',FONT_N);
+  g.font=`6px ${FONT_D}`;txtOut(g,(M.pl.name+' · '+(ce.line||'')).slice(0,22),x+ww/2,y+wh+8.5,5.5,'#ffffff','center');g.restore();}
+{const _md=matchDraw;matchDraw=function(){_md.apply(this,arguments);if(!M||!M.celeb)return;const g=ctx;g.save();g.setTransform(RES,0,0,RES,0,0);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+  try{drawCelebFx(g,cv.width/RES,cv.height/RES);}catch(e){diagLog(e,'celeb');}g.restore();};}
+
 </script>
 
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202610252224').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202610252232').catch(()=>{});});}
 // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
 try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
 </script>
