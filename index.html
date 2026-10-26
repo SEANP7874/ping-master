@@ -8,7 +8,7 @@
 <meta name="description" content="8도시 탁구 리그 구단 매니저 + 직접 조작 탁구 게임">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-180.png">
 <style>html,body{margin:0;background:#050a22;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}</style>
 <title>Ping Master</title>
 
@@ -464,7 +464,7 @@ html.feet #play .gauge{opacity:.85}
 img.por.face.staff{width:48px;height:48px;border-color:var(--line)}
 #opening{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .35s}
 #opening.out{opacity:0}
-#opening video{width:100%;height:100%;object-fit:contain;background:#000}
+#opening video{width:100%;height:100%;object-fit:cover;background:#000}
 .oplogo{position:absolute;left:8%;right:8%;top:14%;display:flex;justify-content:center;pointer-events:none}
 .oplogo img{width:100%;max-width:440px;height:auto;animation:opslam .55s cubic-bezier(.2,1.5,.4,1) both;filter:drop-shadow(0 6px 0 #000)}
 .oplogo b{font-family:var(--f-num);font-size:56px;color:var(--gold);animation:opslam .55s cubic-bezier(.2,1.5,.4,1) both}
@@ -4744,9 +4744,9 @@ const ART_MAN={
   ids:{hangang:'한강빈',mapado:'마파도',yoonbi:'윤비행',neunggeum:'능금아',jeongmil:'정밀한',baekcut:'백커트 옹',padoyeon:'파도연',gobaram:'고바람'},
   have:['card','front','back','portrait','cutin'],
   // 영상에서 뽑은 프레임 시퀀스 (장면별 · fps · 장수)
-  seq:{"hangang":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"mapado":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"baekcut":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"padoyeon":{"special":{"fps":8,"file":"scene","from":4,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}}},
+  seq:{"hangang":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"mapado":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"baekcut":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"padoyeon":{"special":{"fps":8,"file":"scene","from":4,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"jeongmil":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"neunggeum":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}}},
   // 인게임 동작 영상 시트 (10초 · 10fps · 구간: 대기 0-10 · 포핸드 10-20 · 백핸드 20-30 · 블록 30-40 · 스매시 40-55 · 커트 55-65 · 서브 65-80 · 오른쪽 스텝 80-90 · 왼쪽 스텝 90-100)
-  mot:{"hangang":{"front":{"n":100,"fps":10,"cols":10,"fw":198,"fh":354,"ref":330.0,"foot":348.8,"cx":102.4,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":272,"fh":509,"ref":450.0,"foot":506.0,"cx":138.2,"per":50}},"mapado":{"front":{"n":100,"fps":10,"cols":10,"fw":199,"fh":350,"ref":330.0,"foot":348.4,"cx":100.1,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":296,"fh":510,"ref":450.0,"foot":508.1,"cx":149.4,"per":50}},"baekcut":{"front":{"n":100,"fps":10,"cols":10,"fw":200,"fh":361,"ref":330.0,"foot":359.1,"cx":102.2,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":300,"fh":529,"ref":450.0,"foot":527.5,"cx":155.8,"per":50}},"padoyeon":{"front":{"n":100,"fps":10,"cols":10,"fw":201,"fh":352,"ref":330.0,"foot":350.6,"cx":100.2,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":266,"fh":471,"ref":450.0,"foot":470.0,"cx":133.9,"per":50}},"neunggeum":{"front":{"n":100,"fps":10,"cols":10,"fw":230,"fh":406,"ref":330.0,"foot":398.9,"cx":114.7,"per":50}}},
+  mot:{"hangang":{"front":{"n":100,"fps":10,"cols":10,"fw":198,"fh":354,"ref":330.0,"foot":348.8,"cx":102.4,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":272,"fh":509,"ref":450.0,"foot":506.0,"cx":138.2,"per":50}},"mapado":{"front":{"n":100,"fps":10,"cols":10,"fw":199,"fh":350,"ref":330.0,"foot":348.4,"cx":100.1,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":296,"fh":510,"ref":450.0,"foot":508.1,"cx":149.4,"per":50}},"baekcut":{"front":{"n":100,"fps":10,"cols":10,"fw":200,"fh":361,"ref":330.0,"foot":359.1,"cx":102.2,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":300,"fh":529,"ref":450.0,"foot":527.5,"cx":155.8,"per":50}},"padoyeon":{"front":{"n":100,"fps":10,"cols":10,"fw":201,"fh":352,"ref":330.0,"foot":350.6,"cx":100.2,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":266,"fh":471,"ref":450.0,"foot":470.0,"cx":133.9,"per":50}},"neunggeum":{"front":{"n":100,"fps":10,"cols":10,"fw":230,"fh":406,"ref":330.0,"foot":398.9,"cx":114.7,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":302,"fh":524,"ref":450.0,"foot":518.7,"cx":158.3,"per":50}},"jeongmil":{"front":{"n":100,"fps":10,"cols":10,"fw":192,"fh":347,"ref":330.0,"foot":341.6,"cx":99.5,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":267,"fh":476,"ref":450.0,"foot":470.2,"cx":137.2,"per":50,"seg":{"stepR":[0,10,"pp"],"stepL":[0,10,"pp"]}}},"yoonbi":{"back":{"n":100,"fps":10,"cols":10,"fw":265,"fh":469,"ref":450.0,"foot":462.7,"cx":135.9,"per":50,"seg":{"stepR":[0,10,"pp"],"stepL":[0,10,"pp"]}}},"gobaram":{"back":{"n":100,"fps":10,"cols":10,"fw":256,"fh":452,"ref":450.0,"foot":451.0,"cx":126.9,"per":50,"seg":{"stepR":[0,10,"pp"],"stepL":[0,10,"pp"]}}}},
   // 생성 경기장 (탁구대 위치 보정 완료 · 월드 좌표 160×446 · 4배) · yF/hwF/k = 탁구대 원근
   arena:{"seoul":{"yF":118.3,"hwF":31.3,"k":1.726,"fx":80.0,"ads":[{"q":[[26.52,94.95],[51.81,94.95],[51.86,103.63],[26.62,103.68]],"side":false},{"q":[[53.01,94.95],[78.29,94.95],[78.29,103.58],[53.06,103.63]],"side":false},{"q":[[80.5,94.95],[105.59,94.95],[105.59,103.58],[80.5,103.58]],"side":false},{"q":[[106.79,94.95],[131.87,94.95],[131.87,103.58],[106.79,103.58]],"side":false}]},"busan":{"yF":120.0,"hwF":35.6,"k":1.43,"fx":79.9,"ads":[{"q":[[18.75,86.34],[47.17,86.34],[47.29,98.31],[19.0,98.18]],"side":false},{"q":[[49.91,86.34],[78.57,86.34],[78.57,98.18],[50.03,98.18]],"side":false},{"q":[[81.31,86.34],[109.85,86.34],[109.73,98.18],[81.44,98.31]],"side":false},{"q":[[112.72,86.34],[141.13,86.34],[140.88,98.18],[112.72,98.31]],"side":false},{"q":[[3.18,95.19],[13.77,88.09],[14.52,99.68],[4.05,108.78]],"side":true},{"q":[[146.12,88.21],[156.09,94.07],[155.96,108.9],[148.98,104.04]],"side":true}]},"incheon":{"yF":121.9,"hwF":29.6,"k":1.649,"fx":80.0,"ads":[{"q":[[29.65,94.75],[53.57,94.75],[53.57,104.04],[29.76,104.04]],"side":false},{"q":[[55.39,94.75],[79.2,94.75],[79.2,104.04],[55.39,104.04]],"side":false},{"q":[[81.02,94.86],[104.73,94.86],[104.73,104.04],[81.02,104.04]],"side":false},{"q":[[106.65,94.86],[130.36,94.86],[130.36,104.04],[106.65,104.04]],"side":false},{"q":[[12.67,105.64],[26.87,96.57],[26.87,105.11],[12.67,114.61]],"side":true},{"q":[[133.24,96.46],[147.23,105.43],[147.45,114.61],[133.46,105.32]],"side":true}]},"daegu":{"yF":133.5,"hwF":31.0,"k":1.799,"fx":79.7,"ads":[{"q":[[31.99,109.31],[61.34,109.31],[61.34,119.55],[31.9,119.55]],"side":false},{"q":[[63.36,109.31],[96.37,109.31],[96.37,119.55],[63.36,119.55]],"side":false},{"q":[[98.47,109.31],[127.64,109.31],[127.74,119.55],[98.47,119.55]],"side":false},{"q":[[13.24,114.25],[27.88,109.95],[28.06,120.65],[13.43,128.42]],"side":true},{"q":[[131.76,109.86],[146.21,114.16],[146.02,128.24],[131.67,120.65]],"side":true}]},"daejeon":{"yF":111.0,"hwF":30.6,"k":1.96,"fx":80.1,"ads":[{"q":[[0.79,75.41],[17.18,75.51],[17.28,90.04],[0.79,90.25]],"side":false},{"q":[[19.76,75.51],[58.2,75.61],[58.31,90.04],[19.76,90.15]],"side":false},{"q":[[60.99,75.51],[98.92,75.51],[99.02,90.04],[61.09,90.25]],"side":false},{"q":[[101.5,75.51],[140.15,75.41],[140.25,90.15],[101.5,90.25]],"side":false},{"q":[[142.73,75.51],[159.01,75.41],[159.01,90.25],[142.83,90.25]],"side":false}]},"gwangju":{"yF":136.7,"hwF":30.5,"k":1.863,"fx":79.9,"ads":[{"q":[[24.93,113.79],[59.56,113.79],[59.56,126.51],[24.93,126.51]],"side":false},{"q":[[62.29,113.79],[97.6,113.79],[97.6,126.51],[62.29,126.51]],"side":false},{"q":[[100.44,113.79],[135.07,113.68],[135.07,126.39],[100.44,126.51]],"side":false},{"q":[[8.01,121.85],[22.21,114.92],[22.21,127.19],[7.9,136.72]],"side":true},{"q":[[137.68,114.81],[151.99,121.96],[151.99,136.72],[138.25,127.64]],"side":true}]},"gangneung":{"yF":125.0,"hwF":33.5,"k":1.538,"fx":80.0,"ads":[{"q":[[19.39,99.88],[58.26,99.88],[58.05,112.48],[19.71,112.59]],"side":false},{"q":[[60.61,99.88],[99.49,99.88],[99.27,112.48],[60.93,112.59]],"side":false},{"q":[[101.84,99.88],[140.71,99.88],[140.5,112.48],[102.16,112.59]],"side":false}]},"jeju":{"yF":109.4,"hwF":39.1,"k":1.318,"fx":79.9,"ads":[{"q":[[3.96,65.24],[51.37,65.24],[51.74,82.02],[4.5,82.02]],"side":false},{"q":[[55.56,65.24],[105.17,65.24],[104.98,82.02],[55.75,82.02]],"side":false},{"q":[[109.36,65.06],[157.5,65.06],[156.95,82.02],[109.36,82.02]],"side":false},{"q":[[177.74,84.02],[192.15,96.06],[196.34,119.22],[189.6,119.22]],"side":true}]}},
   // B안 경기장 배경 (관중석 · 벽만 · arena_{k}_bg) — 받은 경기장 이름을 추가하면 자동 전환 ('training' = 훈련장)
@@ -4757,7 +4757,7 @@ const ART_MAN={
   // 스태프 초상 (img/staff/{k}.webp) · coach_full = 연습 상대 전신
   staff:['analyst','chairman','coach','scout','sponsor','trainer'],
   // 오프닝 영상 (img/../vid/opening.mp4 · 로고는 게임이 찍어 넣음)
-  op:null,
+  op:{src:'vid/opening.mp4',logoAt:53.1,dur:59},
   // 이벤트 장면 배경 (scene_press 등 · 받으면 이름 추가)
   scene:['press','board','fired','champ'],
   mascot:['seoul','busan','incheon','daegu','daejeon','gwangju','gangneung','jeju'],
@@ -5030,7 +5030,7 @@ function drawPuppet(g,ch,def,view,size,foot,dx,an,t){const A=artBIOf(def.who);co
   // 이동 방향 기억 (사이드 스텝 구간 선택용)
   if(ch._px!=null&&Math.abs(ch.x-ch._px)>.05)ch._mdir=Math.sign(ch.x-ch._px);ch._px=ch.x;
   // 동작 영상 시트가 있으면 해당 구간 프레임으로 그림
-  {const seg=motSeg(an,ch,view);const mm=seg&&ensureMot(A,view);if(mm){const r=drawMot(g,mm,seg,an,t,x,foot,size,body,side,view,ch,def);if(r)return r;}}
+  {let seg=motSeg(an,ch,view);const so=A&&A.motDef&&A.motDef[view]&&A.motDef[view].seg;if(seg&&so){const k=an==='run'?(seg===MOT_SEG.stepR?'stepR':'stepL'):an.startsWith('sv_')?'serve':an;if(so[k])seg=so[k];}const mm=seg&&ensureMot(A,view);if(mm){const r=drawMot(g,mm,seg,an,t,x,foot,size,body,side,view,ch,def);if(r)return r;}}
   const m=pupMotion(an,t,side);const w=im.width/RES,h=im.height/RES;
   // 착지 · 타격 효과 (기존 FX 재사용)
   const T=pupTiming(an);const key=an+'|'+Math.floor(t*RFPS);if(ch._pk!==key){if(an==='smash'&&t>=T.hit+.12&&(ch._pt||0)<T.hit+.12)pxrFxAdd(x,foot,'stomp',STYLE_COL[def.style]||'#ffd23f',body==='big'||body==='muscle',ch);ch._pk=key;ch._pt=t;}
@@ -6231,7 +6231,7 @@ const opAvail=()=>!!(typeof ART_MAN!=='undefined'&&ART_MAN.op&&ART_MAN.op.src&&A
 function playOpening(done){const O=ART_MAN.op;let fin=false;const ov=document.createElement('div');ov.id='opening';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','오프닝 영상');
   const logo=ART_BI.bg&&ART_BI.bg.logo;
   ov.innerHTML=`<video playsinline preload="auto"></video><div class="opeyes" hidden></div><div class="oplogo" hidden>${imgOK(logo)?`<img src="${logo.src}" alt="핑마스터">`:'<b>핑마스터</b>'}</div><div class="opflash"></div><button type="button" class="opskip">건너뛰기 ▶</button>`;
-  document.body.appendChild(ov);const v=ov.querySelector('video');v.src=assetURL(O.src);v.volume=O.music?.35:1;
+  document.body.appendChild(ov);const v=ov.querySelector('video');v.src=assetURL(O.src);v.volume=O.music?.35:1;if(!O.music&&!musicOn)v.muted=true;
   let bgm=null;if(O.music){bgm=new Audio(assetURL(O.music));bgm.volume=musicOn?.9:0;}
   try{Music.stop&&Music.stop();}catch(e){}
   const end=()=>{if(fin)return;fin=true;try{v.pause();}catch(e){}if(bgm)try{bgm.pause();}catch(e){}ov.classList.add('out');setTimeout(()=>{ov.remove();done&&done();},380);try{sessionStorage.setItem('pm.op','1');}catch(e){}};
@@ -6560,7 +6560,7 @@ function drawCelebFx(g,W,H){const ce=M&&M.celeb;if(!ce||!ce.src)return;const a=C
 </script>
 
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202610252258').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202610262153').catch(()=>{});});}
 // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
 try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
 </script>
