@@ -4744,6 +4744,8 @@ const ART_MAN={
   ids:{hangang:'한강빈',mapado:'마파도',yoonbi:'윤비행',neunggeum:'능금아',jeongmil:'정밀한',baekcut:'백커트 옹',padoyeon:'파도연',gobaram:'고바람'},
   have:['card','front','back','portrait','cutin'],
   // 영상에서 뽑은 프레임 시퀀스 (장면별 · fps · 장수)
+  // 장면 프레임 묶음 (한 장에 8열 · 프레임 크기)
+  seqSheet:{"hangang":{"n":64,"fw":248,"fh":440,"cols":8},"mapado":{"n":64,"fw":248,"fh":440,"cols":8},"baekcut":{"n":64,"fw":248,"fh":440,"cols":8},"padoyeon":{"n":64,"fw":248,"fh":440,"cols":8},"jeongmil":{"n":64,"fw":248,"fh":440,"cols":8},"neunggeum":{"n":64,"fw":248,"fh":440,"cols":8}},
   seq:{"hangang":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"mapado":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"baekcut":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"padoyeon":{"special":{"fps":8,"file":"scene","from":4,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"jeongmil":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}},"neunggeum":{"special":{"fps":8,"file":"scene","from":0,"to":28},"win":{"fps":8,"file":"scene","from":28,"to":44},"lose":{"fps":8,"file":"scene","from":44,"to":64}}},
   // 인게임 동작 영상 시트 (10초 · 10fps · 구간: 대기 0-10 · 포핸드 10-20 · 백핸드 20-30 · 블록 30-40 · 스매시 40-55 · 커트 55-65 · 서브 65-80 · 오른쪽 스텝 80-90 · 왼쪽 스텝 90-100)
   mot:{"hangang":{"front":{"n":100,"fps":10,"cols":10,"fw":198,"fh":354,"ref":330.0,"foot":348.8,"cx":102.4,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":272,"fh":509,"ref":450.0,"foot":506.0,"cx":138.2,"per":50}},"mapado":{"front":{"n":100,"fps":10,"cols":10,"fw":199,"fh":350,"ref":330.0,"foot":348.4,"cx":100.1,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":296,"fh":510,"ref":450.0,"foot":508.1,"cx":149.4,"per":50}},"baekcut":{"front":{"n":100,"fps":10,"cols":10,"fw":200,"fh":361,"ref":330.0,"foot":359.1,"cx":102.2,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":300,"fh":529,"ref":450.0,"foot":527.5,"cx":155.8,"per":50}},"padoyeon":{"front":{"n":100,"fps":10,"cols":10,"fw":201,"fh":352,"ref":330.0,"foot":350.6,"cx":100.2,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":266,"fh":471,"ref":450.0,"foot":470.0,"cx":133.9,"per":50}},"neunggeum":{"front":{"n":100,"fps":10,"cols":10,"fw":230,"fh":406,"ref":330.0,"foot":398.9,"cx":114.7,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":302,"fh":524,"ref":450.0,"foot":518.7,"cx":158.3,"per":50}},"jeongmil":{"front":{"n":100,"fps":10,"cols":10,"fw":192,"fh":347,"ref":330.0,"foot":341.6,"cx":99.5,"per":50},"back":{"n":100,"fps":10,"cols":10,"fw":267,"fh":476,"ref":450.0,"foot":470.2,"cx":137.2,"per":50,"seg":{"stepR":[0,10,"pp"],"stepL":[0,10,"pp"]}}},"yoonbi":{"back":{"n":100,"fps":10,"cols":10,"fw":265,"fh":469,"ref":450.0,"foot":462.7,"cx":135.9,"per":50,"seg":{"stepR":[0,10,"pp"],"stepL":[0,10,"pp"]}}},"gobaram":{"back":{"n":100,"fps":10,"cols":10,"fw":256,"fh":452,"ref":450.0,"foot":451.0,"cx":126.9,"per":50,"seg":{"stepR":[0,10,"pp"],"stepL":[0,10,"pp"]}}}},
@@ -4795,6 +4797,11 @@ function artBILoad(){if(typeof ART_MAN==='undefined')return;const ps=[];const mk
 const imgOK=im=>!!(im&&(im.naturalWidth||im.tagName==='CANVAS'&&im.width));
 // 장면 영상 프레임: 처음 필요할 때 불러옴 → 다 받으면 다시 그림
 function ensureSeq(A,sc){const q=A.seqDef&&A.seqDef[sc];if(!q||A.seq[sc]||A['_sq'+sc])return;A['_sq'+sc]=1;
+  // 묶음 한 장에서 필요한 장면 프레임만 잘라 씀 (파일 수 · 요청 수 절감)
+  const SS=typeof ART_MAN!=='undefined'&&ART_MAN.seqSheet&&ART_MAN.seqSheet[A.id];
+  if(SS){const load=A._seqSheet||(A._seqSheet=new Promise(r=>{const im=new Image();im.decoding='async';im.onload=()=>r(im);im.onerror=()=>r(null);im.src=assetURL(`img/seq/${A.id}_${q.file}.webp`);}));
+    load.then(im=>{if(!im||!im.naturalWidth)return;const f=[];for(let i=q.from;i<Math.min(q.to,SS.n);i++){const [c,g]=cvs(SS.fw,SS.fh);c.naturalWidth=SS.fw;c.naturalHeight=SS.fh;g.drawImage(im,(i%SS.cols)*SS.fw,Math.floor(i/SS.cols)*SS.fh,SS.fw,SS.fh,0,0,SS.fw,SS.fh);f.push(c);}
+      if(f.length>2){A.seq[sc]={fps:q.fps,f};artBump();}});return;}
   const f=Array.from({length:q.to-q.from},(_,i)=>{const im=new Image();im.decoding='async';im.src=assetURL(`img/seq/${A.id}_${q.file}_${String(q.from+i).padStart(2,'0')}.webp`);return im;});
   Promise.all(f.map(im=>new Promise(r=>{if(im.complete)r();else{im.onload=r;im.onerror=r;}}))).then(()=>{const ok=f.filter(im=>im.naturalWidth);if(ok.length>2){A.seq[sc]={fps:q.fps,f:ok};artBump();}});}
 // 인게임 동작 시트: 경기에 나올 때 불러옴
@@ -6560,7 +6567,7 @@ function drawCelebFx(g,W,H){const ce=M&&M.celeb;if(!ce||!ce.src)return;const a=C
 </script>
 
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202610262153').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202610262158').catch(()=>{});});}
 // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
 try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
 </script>
