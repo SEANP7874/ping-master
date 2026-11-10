@@ -482,6 +482,9 @@ img.por.face.staff{width:48px;height:48px;border-color:var(--line)}
 .gauge.lock{opacity:.45;filter:grayscale(.8)}
 .trgrade{display:flex;gap:12px;align-items:center;padding:8px 10px;border:2px solid var(--line,#2a3a8a);background:rgba(0,161,222,.08)}
 .trg{font-family:var(--f-num);font-size:44px;line-height:1;color:var(--gc);text-shadow:0 3px 0 #000;min-width:40px;text-align:center}
+.kpis3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}.kpis3>div{border:2px solid var(--line,#2a3a8a);padding:6px 4px;display:flex;flex-direction:column;gap:2px}.kpis3 b{font-family:var(--f-num);font-size:18px}
+.wkrow{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);gap:6px;flex-wrap:wrap}.wkrow:last-child{border-bottom:0}
+.awds{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.awd{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;border:2px solid var(--gold,#ffd23f);padding:8px 4px;background:rgba(255,210,63,.07)}.awd img,.awd canvas{max-width:100%}
 .perkrow{gap:4px;align-items:center;margin-top:6px}
 .opsnd{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:max(16px,env(safe-area-inset-top,0px));min-height:40px;padding:0 14px;border:2px solid rgba(255,255,255,.6);background:rgba(0,0,0,.45);color:#fff;font-family:var(--f-disp);font-size:15px;cursor:pointer}
 .opskip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:max(16px,env(safe-area-inset-top,0px));min-height:40px;padding:0 14px;border:2px solid rgba(255,255,255,.6);background:rgba(0,0,0,.45);color:#fff;font-family:var(--f-disp);font-size:15px;cursor:pointer}
@@ -6729,10 +6732,57 @@ let TR_FIN=null;
 {const _rs=renderSquad;renderSquad=function(){const r=_rs.apply(this,arguments);try{for(const p of S.players){if(!p.perks||!p.perks.length)continue;const b=document.querySelector(`#scr-squad [data-card-open="${p.id}"]`);const box=b&&b.closest('.box');if(!box)continue;
       const d=document.createElement('div');d.className='row wrap perkrow';d.innerHTML='<span class="tiny muted">특기</span>'+p.perks.map(k=>`<span class="pill gold" title="${PERKS[k]?PERKS[k][1]:''}">${PERKS[k]?PERKS[k][0]:k}</span>`).join('');box.appendChild(d);}}catch(e){}return r;};}
 
+/* ---------- 4. 육성 · 경영 (v18.1) ---------- */
+// 성장 유형: 선수마다 고정 (조숙형 · 대기만성형 · 꾸준형) → 훈련 성장에 반영
+const GROW={early:['조숙형','20세까지 훈련 성장 +25% · 26세부터 -20%'],late:['대기만성형','20세까지 -10% · 24세부터 +25%'],steady:['꾸준형','나이와 관계없이 성장 +8%']};
+function growOf(p){if(!p.grow){const h=hashS(String(p.name)+'|'+(p.id|0))%10;p.grow=h<3?'early':h<6?'late':'steady';}return p.grow;}
+function growAge(p){const g=growOf(p);return g==='early'?(p.age<=20?1.25:p.age>=26?.8:1):g==='late'?(p.age<=20?.9:p.age>=24?1.25:1):1.08;}
+// 기세(폼): -2 슬럼프 ~ +2 절정 · 매주 사기 · 컨디션 · 출전에 따라 움직임 → 경기 판정 구간과 훈련 성장에 반영
+const FORM_KO={'-2':['슬럼프','#ff5a6a','▼▼'],'-1':['부진','#ff9a6a','▼'],'0':['보통','#aab7e3','─'],'1':['호조','#7ae04a','▲'],'2':['절정','#ffd23f','▲▲']};
+const formOf=p=>clamp(p.form|0,-2,2);
+function formWeekly(){const out=[];for(const p of S.players){const f0=formOf(p);let tgt=(p.morale-50)/25+(p.cond-60)/45;if(p.inj>0)tgt-=1;if(S.week-(p.lastPlayed||0)>3)tgt-=.5;tgt=clamp(Math.round(tgt+rand(-.6,.6)),-2,2);
+    let f=f0;if(tgt!==f0&&Math.random()<.6)f+=Math.sign(tgt-f0);const r=Math.random();if(r<.06)f--;else if(r>.94)f++;p.form=clamp(f,-2,2);if(p.form!==f0)out.push([p,f0,p.form]);}return out;}
+{const _gm=growMul;growMul=function(stat){let m=_gm.apply(this,arguments);try{const p=TR_FIN&&TR_FIN.pl||(typeof M!=='undefined'&&M&&mode==='match'&&M.pl)||null;if(p){m*=1+formOf(p)*.06;if(TR_FIN)m*=growAge(p);}}catch(e){}return m;};}
+{const _w2=windows;windows=function(){const w=_w2.apply(this,arguments);try{const f=1+formOf(M.pl)*.03;return {perf:w.perf*f,good:w.good*f};}catch(e){return w;}};}
+// 주간 보고 + 추가 이벤트(면담 · 도발 · 팬 미팅 · 특훈)
+let V18_EV=false,V18_SNAP=null;
+{const _te=triggerEvent;triggerEvent=function(){V18_EV=true;return _te.apply(this,arguments);};}
+function v18Report(changes,snap,done){const dB=S.budget-snap.budget,dF=S.fans-snap.fans;const need=S.players.filter(p=>p.cond<50||p.inj>0);const hot=S.players.filter(p=>formOf(p)>=1),cold=S.players.filter(p=>formOf(p)<=-1);
+  const row=p=>{const F=FORM_KO[formOf(p)];return `<div class="row sb wkrow"><span><b>${esc(p.name)}</b> <small class="muted">${GROW[growOf(p)][0]}</small></span><span><span class="pill" style="color:${F[1]};border-color:${F[1]}">${F[2]} ${F[0]}</span> <small class="muted">컨디션 ${p.cond} · 사기 ${p.morale}</small></span></div>`;};
+  const tip=need.length?`${need.map(p=>p.name).join(', ')} — 휴식 또는 약한 강도의 훈련을 권함.`:cold.length?`${cold[0].name}의 기세가 떨어져 있음. 면담이나 출전 기회로 사기를 올려 볼 것.`:hot.length?`${hot[0].name}의 기세가 좋음. 이번 주 경기에 내보내기 좋은 시점.`:'선수단 상태 양호. 강한 훈련으로 밀어붙여도 됨.';
+  showModal(`<span class="lbl">WEEKLY REPORT · WEEK ${S.week}</span><h2 class="h">주간 보고</h2>
+    <div class="kpis3"><div><small>지난주 손익</small><b class="${dB>=0?'pos':'neg'}">${dB>=0?'+':''}${dB}만</b></div><div><small>보유 자금</small><b>${S.budget}만</b></div><div><small>팬</small><b class="${dF>=0?'pos':'neg'}">${dF>=0?'+':''}${dF}</b></div></div>
+    <div class="box" style="padding:8px">${S.players.map(row).join('')}</div>
+    ${changes.length?`<div class="tiny muted">기세 변화: ${changes.map(([p,a,b])=>`${esc(p.name)} ${FORM_KO[a][0]}→${FORM_KO[b][0]}`).join(' · ')}</div>`:''}
+    <div class="notice">코치: ${esc(tip)}</div><button class="btn block" data-close>확인</button>`,null,{onClose:()=>{done&&done();}});}
+function v18Event(next){const ps=S.players.filter(p=>!p.inj);if(!ps.length){next&&next();return;}const pool=[];const slump=ps.find(p=>formOf(p)<0)||null;const star=[...ps].sort((a,b)=>ovr(b)-ovr(a))[0];const young=ps.find(p=>p.age<=19)||pick(ps);
+  if(slump)pool.push({t:'선수 면담',d:`${slump.name} 선수가 요즘 뜻대로 안 풀린다며 면담을 청함.`,o:[['끝까지 믿는다고 말한다 (기세 +1 · 사기 +8)',()=>{slump.form=clamp(formOf(slump)+1,-2,2);slump.morale=clamp(slump.morale+8,0,100);}],['따끔하게 지적한다 (멘탈 +0.2 · 사기 -6)',()=>{addStat(slump,'men',.2);slump.morale=clamp(slump.morale-6,0,100);}],['이번 주는 쉬게 한다 (컨디션 +30 · 훈련 1회 차감)',()=>{slump.cond=Math.min(100,slump.cond+30);S.trainLeft=Math.max(0,S.trainLeft-1);}]]});
+  pool.push({t:'라이벌의 도발',d:`다음 상대 에이스가 인터뷰에서 "${star.name}? 5분이면 충분하지"라고 말함.`,o:[['맞받아친다 (팬 +25 · 사기 +6 · 지면 신임 부담)',()=>{S.fans+=25;star.morale=clamp(star.morale+6,0,100);S.fanMood=clamp(S.fanMood+2,0,100);}],['경기로 답하겠다 (멘탈 +0.2 · 기세 +1)',()=>{addStat(star,'men',.2);star.form=clamp(formOf(star)+1,-2,2);}]]});
+  pool.push({t:'팬 미팅 요청',d:'팬클럽에서 주말 팬 미팅을 열어 달라고 요청함.',o:[['전원 참석 (팬 +40 · 전원 컨디션 -8)',()=>{S.fans+=40;S.players.forEach(p=>p.cond=Math.max(10,p.cond-8));}],[`${star.name}만 보낸다 (팬 +20 · 사기 +4)`,()=>{S.fans+=20;star.morale=clamp(star.morale+4,0,100);star.cond=Math.max(10,star.cond-8);}],['훈련에 집중한다 (팬 만족도 -2 · 전원 EXP +10)',()=>{S.fanMood=clamp(S.fanMood-2,0,100);S.players.forEach(p=>gainExp(p,10));}]]});
+  pool.push({t:'새벽 특훈 요청',d:`${young.name} 선수가 새벽 개인 특훈을 하게 해 달라고 함.`,o:[['허락한다 (가장 낮은 능력 +0.3 · 컨디션 -15)',()=>{const k=Object.entries(young.stats).sort((a,b)=>a[1]-b[1])[0][0];addStat(young,k,.3);young.cond=Math.max(10,young.cond-15);}],['코치를 붙여 준다 (-15만 · 능력 +0.3 · 컨디션 -5)',()=>{money('other',-15,'특훈 수당');const k=Object.entries(young.stats).sort((a,b)=>a[1]-b[1])[0][0];addStat(young,k,.3);young.cond=Math.max(10,young.cond-5);}],['말린다 (컨디션 +10 · 사기 -3)',()=>{young.cond=Math.min(100,young.cond+10);young.morale=clamp(young.morale-3,0,100);}]]});
+  pool.push({t:'유소년 탁구 교실',d:`${CITY[S.city].ko} 교육청에서 초등학생 탁구 교실 강사를 부탁함.`,o:[['구단 행사로 연다 (+25만 · 팬 +15)',()=>{money('other',25,'탁구 교실 수익');S.fans+=15;}],['무료로 봉사한다 (명성 +1 · 팬 만족도 +4)',()=>{S.fame=(S.fame||0)+1;S.fanMood=clamp(S.fanMood+4,0,100);}]]});
+  const ev=pick(pool);showModal(`<span class="lbl">CLUB STORY · WEEK ${S.week}</span><div class="ev-card"><h2 class="h">${esc(ev.t)}</h2><p style="margin:0">${esc(ev.d)}</p></div>
+    ${ev.o.map((o,i)=>`<button class="btn ${i?'ghost ':''}block" data-ev="${i}">${esc(o[0])}</button>`).join('')}`,()=>{mbox.querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{try{ev.o[+b.dataset.ev][1]();}catch(e){}sfx('coin');save();closeModal();});},{closable:false,onClose:()=>{renderAll();next&&next();}});}
+{const _aw=advanceWeek;advanceWeek=function(next){const w0=S.week,s0=S.season;const snap=S.wkSnap||{budget:S.budget,fans:S.fans};V18_EV=false;
+    return _aw.call(this,()=>{try{if(!S||S.over||S.season!==s0||S.week===w0){next&&next();return;}const changes=formWeekly();S.wkSnap={budget:S.budget,fans:S.fans};save();
+        const after=()=>{if(!V18_EV&&Math.random()<.5)v18Event(next);else next&&next();};v18Report(changes,snap,after);}catch(e){next&&next();}});};}
+// 시즌 시상식 (우리 구단): MVP · 성장왕 · 훈련왕
+{const _se=seasonEnd;seasonEnd=function(){const self=this,args=arguments;try{const ps=S.players;if(ps.length&&!S._awarded){S._awarded=true;
+      const gain=p=>p.base?sum(Object.values(p.stats))-sum(Object.values(p.base)):0;
+      const mvp=[...ps].sort((a,b)=>(b.sw||0)-(a.sw||0)||ovr(b)-ovr(a))[0],gr=[...ps].sort((a,b)=>gain(b)-gain(a))[0],tr=[...ps].sort((a,b)=>((b.perks||[]).length-(a.perks||[]).length)||sum(Object.values(b.tp||{}))-sum(Object.values(a.tp||{})))[0];
+      mvp.morale=clamp(mvp.morale+10,0,100);S.fans+=30;addStat(gr,'men',.2);
+      const card=(ttl,p,sub)=>`<div class="awd"><span class="lbl">${ttl}</span>${pfHTML(p,uniMe(),'win','lg')}<b>${esc(p.name)}</b><small class="muted">${sub}</small></div>`;
+      showModal(`<span class="lbl">SEASON ${S.season} AWARDS</span><h2 class="h">구단 시상식</h2><div class="awds">${card('MVP',mvp,`${mvp.sw||0}승 ${mvp.sl||0}패`)}${card('성장왕',gr,`능력 합계 +${gain(gr).toFixed(1)}`)}${card('훈련왕',tr,`특기 ${(tr.perks||[]).length}개`)}</div>
+        <div class="notice">MVP 사기 +10 · 팬 +30 · 성장왕 멘탈 +0.2</div><button class="btn block" data-close>시즌 결산 보기</button>`,null,{onClose:()=>{S._awarded=false;_se.apply(self,args);}});try{sfx('win');}catch(e){}return;}}catch(e){}
+    S._awarded=false;return _se.apply(self,args);};}
+// 선수단 화면: 성장 유형 · 기세 표시
+{const _rs2=renderSquad;renderSquad=function(){const r=_rs2.apply(this,arguments);try{for(const p of S.players){const b=document.querySelector(`#scr-squad [data-card-open="${p.id}"]`);const box=b&&b.closest('.box');if(!box)continue;const F=FORM_KO[formOf(p)];
+      const d=document.createElement('div');d.className='row wrap perkrow';d.innerHTML=`<span class="pill" style="color:${F[1]};border-color:${F[1]}" title="경기 판정 구간과 성장에 반영">기세 ${F[2]} ${F[0]}</span><span class="pill mut" title="${GROW[growOf(p)][1]}">${GROW[growOf(p)][0]}</span>`;box.appendChild(d);}}catch(e){}return r;};}
+
 </script>
 
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611102243').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611102326').catch(()=>{});});}
 // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
 try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
 </script>
