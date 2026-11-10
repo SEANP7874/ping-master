@@ -485,6 +485,7 @@ img.por.face.staff{width:48px;height:48px;border-color:var(--line)}
 .kpis3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}.kpis3>div{border:2px solid var(--line,#2a3a8a);padding:6px 4px;display:flex;flex-direction:column;gap:2px}.kpis3 b{font-family:var(--f-num);font-size:18px}
 .wkrow{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);gap:6px;flex-wrap:wrap}.wkrow:last-child{border-bottom:0}
 .awds{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.awd{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;border:2px solid var(--gold,#ffd23f);padding:8px 4px;background:rgba(255,210,63,.07)}.awd img,.awd canvas{max-width:100%}
+[data-train]{word-break:keep-all;padding-left:2px;padding-right:2px;font-size:14px;letter-spacing:-.3px}
 .perkrow{gap:4px;align-items:center;margin-top:6px}
 .opsnd{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:max(16px,env(safe-area-inset-top,0px));min-height:40px;padding:0 14px;border:2px solid rgba(255,255,255,.6);background:rgba(0,0,0,.45);color:#fff;font-family:var(--f-disp);font-size:15px;cursor:pointer}
 .opskip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:max(16px,env(safe-area-inset-top,0px));min-height:40px;padding:0 14px;border:2px solid rgba(255,255,255,.6);background:rgba(0,0,0,.45);color:#fff;font-family:var(--f-disp);font-size:15px;cursor:pointer}
@@ -6782,7 +6783,7 @@ function v18Event(next){const ps=S.players.filter(p=>!p.inj);if(!ps.length){next
 </script>
 
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611110024').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611110634').catch(()=>{});});}
 // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
 try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
 </script>
