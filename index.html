@@ -6783,7 +6783,7 @@ function v18Event(next){const ps=S.players.filter(p=>!p.inj);if(!ps.length){next
 </script>
 
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611110634').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611112053').catch(()=>{});});}
 // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
 try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
 </script>
