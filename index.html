@@ -486,6 +486,8 @@ img.por.face.staff{width:48px;height:48px;border-color:var(--line)}
 .wkrow{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);gap:6px;flex-wrap:wrap}.wkrow:last-child{border-bottom:0}
 .awds{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.awd{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;border:2px solid var(--gold,#ffd23f);padding:8px 4px;background:rgba(255,210,63,.07)}.awd img,.awd canvas{max-width:100%}
 [data-train]{word-break:keep-all;padding-left:2px;padding-right:2px;font-size:14px;letter-spacing:-.3px}
+.spbox{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}.spbox>.small{flex-basis:100%}
+.traits{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0;font-size:12px;line-height:1.5;color:var(--muted)}.traits dt{opacity:.75;white-space:nowrap}.traits dd{margin:0}.traits dd b{color:var(--fg);font-weight:700}
 .perkrow{gap:4px;align-items:center;margin-top:6px}
 .opsnd{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:max(16px,env(safe-area-inset-top,0px));min-height:40px;padding:0 14px;border:2px solid rgba(255,255,255,.6);background:rgba(0,0,0,.45);color:#fff;font-family:var(--f-disp);font-size:15px;cursor:pointer}
 .opskip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:max(16px,env(safe-area-inset-top,0px));min-height:40px;padding:0 14px;border:2px solid rgba(255,255,255,.6);background:rgba(0,0,0,.45);color:#fff;font-family:var(--f-disp);font-size:15px;cursor:pointer}
@@ -668,6 +670,9 @@ function sfx(k){
 
 document.addEventListener('pointerdown',ensureAudio,{passive:true});
 document.addEventListener('keydown',ensureAudio);
+
+// 제작용 메뉴(아트 팩 · 오류 기록)는 개발자 모드에서만 노출 (주소에 ?dev=1 또는 localStorage pm.dev=1)
+const DEV=(()=>{try{if(/[?&]dev=1/.test(location.search))localStorage.setItem('pm.dev','1');if(/[?&]dev=0/.test(location.search))localStorage.removeItem('pm.dev');return localStorage.getItem('pm.dev')==='1';}catch(e){return false;}})();
 
 /* ================= 벨소리 화음 엔진 (2-OP FM · 현악 패드 · 화음 라인 · 리버브) =================
    폴더폰 40화음 벨소리 질감: FM 벨/브라스/일렉피아노 리드 + 코드 패드 + 3도 화음 + FM 베이스 + 드럼 + 잔향 */
@@ -955,7 +960,7 @@ function affinity(a,b){
   const st=(STYLE_ADV[a.style]||{})[b.style]||0,rb=(RUB_ADV[a.rubber]||{})[b.rubber]||0,hd=a.hand!==b.hand?(a.hand==='L'?.5:-.5):0;
   const why=[];if(st)why.push((st>0?'▲ ':'▼ ')+(STYLE_WHY[st>0?`${a.style}>${b.style}`:`${b.style}>${a.style}`]||'전형 상성'));
   if(rb)why.push((rb>0?'▲ ':'▼ ')+(RUB_WHY[rb>0?`${a.rubber}>${b.rubber}`:`${b.rubber}>${a.rubber}`]||'러버 상성'));
-  if(hd)why.push(hd>0?'▲ 왼손잡이 — 상대가 낯선 각도':'▼ 상대 왼손잡이 — 낯선 각도');
+  if(hd)why.push(hd>0?'▲ 왼손잡이: 상대가 낯선 각도':'▼ 상대 왼손잡이: 낯선 각도');
   return {st,rb,hd,total:r1(st+rb*.6+hd*.8),why};
 }
 const CITY=Object.fromEntries(CITIES.map(c=>[c.k,c]));
@@ -1006,8 +1011,8 @@ const AI_SPON={seoul:{led:['EUNHA','MILK','NEON','GYM24'],banner:['BARAM'],floor
   incheon:{led:['AIRPT','MATNA','GYM24','MUNGU'],banner:['BARAM'],kit:'SPINW'},daegu:{led:['APPLE','YAKGUK','HOT','MATNA'],banner:['TAEGEUK']},daejeon:{led:['ROBOT','LAB','EXPO','MILK'],banner:['PUREUN'],floor:'EUNHA',kit:'RUBBR'},
   gwangju:{led:['MUDEUNG','KIMCHI','MATNA','GYM24'],banner:['HANGYEOL']},gangneung:{led:['COFFEE','SURF','MILK','SUN'],banner:['BARAM'],kit:'RUNUP'},jeju:{led:['GYUL','HALLA','WIND','MATNA'],banner:['DASOM'],floor:'NURI'}};
 const ARENA_NAME={seoul:'한강 돔',busan:'광안 아레나',incheon:'하늘길 체육관',daegu:'달구벌 홀',daejeon:'엑스포 아레나',gwangju:'무등 체육관',gangneung:'경포 아레나',jeju:'돌하르방 홀'};
-const ARENA_LINE={seoul:'네온이 빛나는 수도의 돔 — 관중의 눈높이가 다름!',busan:'바다 바람이 부는 광안 아레나 — 함성이 파도처럼!',incheon:'활주로 유도등이 깜빡이는 하늘길 체육관!',daegu:'한여름 열기 그대로 — 달구벌 홀은 뜨겁다!',
-  daejeon:'회로 전광판이 번쩍이는 과학 도시의 엑스포 아레나!',gwangju:'단풍이 흩날리는 무등 체육관 — 끈기의 홈!',gangneung:'동해 일출빛이 스며드는 경포 아레나!',jeju:'돌담과 귤 향기 — 돌하르방 홀에 바람이 분다!'};
+const ARENA_LINE={seoul:'네온이 빛나는 수도의 돔, 관중의 눈높이가 다름!',busan:'바다 바람이 부는 광안 아레나, 함성이 파도처럼!',incheon:'활주로 유도등이 깜빡이는 하늘길 체육관!',daegu:'한여름 열기 그대로, 달구벌 홀은 뜨겁다!',
+  daejeon:'회로 전광판이 번쩍이는 과학 도시의 엑스포 아레나!',gwangju:'단풍이 흩날리는 무등 체육관, 끈기의 홈!',gangneung:'동해 일출빛이 스며드는 경포 아레나!',jeju:'돌담과 귤 향기, 돌하르방 홀에 바람이 분다!'};
 const INTENS={low:{ko:'약',mul:.7,cond:6,inj:0},mid:{ko:'중',mul:1,cond:12,inj:.02},high:{ko:'강',mul:1.4,cond:20,inj:.12}};
 const TRAINS={
   multi:{name:'다구 훈련',stat:'ctl',norm:40,desc:'공이 링에 닿을 때 해당 레인 버튼 탭'},
@@ -3871,7 +3876,7 @@ function setupServe(){
   $('#serveBar').hidden=!me||M.mode==='adv';meter.hidden=true;refit();
   if(me){if(M.mode==='adv'){setCtrl('pads');padLabels(true);}else setCtrl('serve');setServeGauge(0);
     hint.textContent='상대 코트 탭 = 목표 · 내 코트 드래그 = 위치';}
-  else{setCtrl(M.mode==='adv'?'pads':'shots');if(M.mode==='adv')padLabels(false);hint.textContent='상대 서브 — 회전 궤적 색을 보고 대응';}
+  else{setCtrl(M.mode==='adv'?'pads':'shots');if(M.mode==='adv')padLabels(false);hint.textContent='상대 서브: 회전 궤적 색을 보고 대응';}
 }
 function serveDown(){if(M.state==='serve'&&curServer()==='p'&&!M.charging&&!CUT.on){M.charging=true;M.chargeT0=CLOCK;setAnim(M.p,'sh_'+M.p.sv);}}
 function serveUp(kind,dir){if(!M.charging||M.state!=='serve')return;M.charging=false;playerServe(tri(CLOCK-M.chargeT0),kind||M.serveSpin,dir||1);}
@@ -4254,7 +4259,7 @@ function setCtrl(kind){
   ctrl.className='ctrl'+({serve:' c1',servetrain:' c1',foot:' c1',lanes:' c3',pads:' pads'}[kind]||'');
   if(kind==='serve')ctrl.innerHTML=`<button class="cbtn serve" data-a="serve" id="svBtn"><span class="sg"><i class="sweet"></i><i class="fill" id="svFill"></i></span><b>서브</b><small>꾹 눌러 충전 · 노란 구간에서 떼기</small></button>`;
   else if(kind==='shots')ctrl.innerHTML=`<button class="cbtn drive" data-a="drive">드라이브<small>1·Z 상회전</small></button><button class="cbtn cut" data-a="cut">커트<small>2·X 하회전</small></button><button class="cbtn block" data-a="block">블록<small>3·C 안정</small></button><button class="cbtn smash" data-a="smash">스매시<small>4·V 결정타</small></button>`;
-  else if(kind==='servetrain')ctrl.innerHTML=`<button class="cbtn serve" data-a="serve">서브 — 꾹 눌러 충전 · 떼면 발사<small>SPACE</small></button>`;
+  else if(kind==='servetrain')ctrl.innerHTML=`<button class="cbtn serve" data-a="serve">서브: 꾹 눌러 충전 · 떼면 발사<small>SPACE</small></button>`;
   else if(kind==='lanes')ctrl.innerHTML=`<button class="cbtn lane" data-a="l0">◀<small>LEFT · 1</small></button><button class="cbtn lane" data-a="l1">●<small>CENTER · 2</small></button><button class="cbtn lane" data-a="l2">▶<small>RIGHT · 3</small></button>`;
   else if(kind==='pads')ctrl.innerHTML=`<div class="pad move" data-pad="move">◀ 이동 ▶<small>좌우로 드래그</small></div><div class="pad hit" data-pad="hit" id="padHit">스와이프 타격<small>↑ 드라이브 · 빠른↑ 스매시<br>↓ 커트 · 탭 블록 · 좌우 = 코스</small></div>`;
   else ctrl.innerHTML=`<div class="hint" style="align-self:center">경기장을 탭한 위치로 달려감</div>`;
@@ -4466,11 +4471,11 @@ function finishMatch(){
   S._wk=[];const fin=weekFinance(m,w);const SX=sponSettleMatch(m,fin.att);const MS=checkSpMission(m,w);const wk=S._wk;S._wk=null;
   S.streak=w?Math.max(1,S.streak+1):Math.min(-1,S.streak-1);
   const notes=[];
-  if(S.flags.promise){if(w){S.trust+=4;notes.push('공언한 승리 달성 — 이사회 신임 +4');}else{S.trust-=6;notes.push('공언한 승리 실패 — 이사회 신임 -6');}S.flags.promise=false;}
+  if(S.flags.promise){if(w){S.trust+=4;notes.push('공언한 승리 달성: 이사회 신임 +4');}else{S.trust-=6;notes.push('공언한 승리 실패: 이사회 신임 -6');}S.flags.promise=false;}
   if(S.streak<=-5&&!S.warned){S.warned=true;S.trust-=8;S.flags.boardWarn=true;}
   if(S.streak>0)S.warned=false;
-  if(S.streak===5){S.trust+=4;notes.push('5연승 — 이사회 신임 +4');}
-  if(S.budget<0){const d=S.budget<-300?12:4;S.trust-=d;notes.push(`${S.budget<-300?'파산 위기':'예산 적자'} — 이사회 신임 -${d}`);}
+  if(S.streak===5){S.trust+=4;notes.push('5연승: 이사회 신임 +4');}
+  if(S.budget<0){const d=S.budget<-300?12:4;S.trust-=d;notes.push(`${S.budget<-300?'파산 위기':'예산 적자'}: 이사회 신임 -${d}`);}
   S.trust=clamp(S.trust,0,100);
   S.hist.push(sum(wk.map(x=>x[1])));
   S.results.push({week:S.week,opp:m.oi,home:m.home,won:w,games:[gw,gl],log:m.log,pid:pl.id,mode:m.mode,forfeit:!!m.forfeit});
@@ -4485,7 +4490,7 @@ function finishMatch(){
     ${SX.rows.length?`<div class="box flat small"><span class="lbl">SPONSOR EXPOSURE · 노출 리포트</span>
       <div class="tiny muted">시청자 ${fmt(SX.A.aud)}명 (관중+중계) × ${SX.A.mult}${SX.A.why.length?' · '+SX.A.why.join(' · '):''} · 경기 ${SX.dur}초</div>
       <div class="scroll-x"><table class="tbl"><tbody>${SX.rows.map(r=>{const P=kpiPace(r.s);const sg=kpiSig(P.pace);return `<tr><td class="l">${esc(r.s.name)} <span class="tiny muted">${SLOTS[r.s.slot].ko}${r.on?'':' · 원정 미노출'}</span></td><td class="r">+${r.e}만 뷰${r.ev?` <span class="tiny muted">(이벤트 +${r.ev})</span>`:''}</td><td class="r"><span class="pill ${sg[3]}">${Math.round(P.ach*100)}%</span></td></tr>`;}).join('')}</tbody></table></div></div>`:''}
-    ${MS?`<div class="notice ${MS.ok?'':'bad'}">스폰서 미션 · ${esc(MS.sm.name)} "${esc(MS.sm.ko)}" — ${MS.ok?`<span class="pos">달성 +${MS.sm.bonus}만</span>`:`미달 (${MS.v}/${MS.sm.n})`}</div>`:''}
+    ${MS?`<div class="notice ${MS.ok?'':'bad'}">스폰서 미션 · ${esc(MS.sm.name)} "${esc(MS.sm.ko)}" ${MS.ok?`<span class="pos">달성 +${MS.sm.bonus}만</span>`:`미달 (${MS.v}/${MS.sm.n})`}</div>`:''}
     <span class="lbl">THIS WEEK P&amp;L</span>${ledgerHTML(wk)}
     ${notes.map(n=>`<div class="notice">${esc(n)}</div>`).join('')}
     ${msgs.map(x=>`<div class="lvup">★ ${esc(x)}</div>`).join('')}
@@ -4502,7 +4507,7 @@ function mediaInterview(w,next){
     ['승리 공언','"다음 경기에서 반드시 증명하겠습니다."','팬 +8 · 다음 경기 승리 시 신임 +4, 패배 시 -6',()=>{S.fans+=8;S.flags.promise=true;}]];
   showModal(`<span class="lbl">PRESS CONFERENCE</span><h2 class="h">경기 후 기자회견</h2>${sceneHTML('press',{club:CITY[S.city].en,c:uniMe().c,sp:(S.sponsors.find(x=>x.slot==='title')||S.sponsors.find(x=>x.slot==='floor')||S.sponsors[0]||{}).en||'LEAGUE',city:S.city})}
     <p class="small" style="margin:0">기자: "${w?'오늘 승리의 비결은 무엇입니까?':'오늘 패배를 어떻게 보십니까?'}"</p>
-    ${opts.map((o,i)=>`<button class="pick" data-i="${i}"><div class="col"><b>${o[0]} — ${esc(o[1])}</b><span class="small muted">${o[2]}</span></div></button>`).join('')}`,()=>{
+    ${opts.map((o,i)=>`<button class="pick" data-i="${i}"><div class="col"><b>${o[0]} · ${esc(o[1])}</b><span class="small muted">${o[2]}</span></div></button>`).join('')}`,()=>{
     mbox.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{opts[+b.dataset.i][3]();S.trust=clamp(S.trust,0,100);save();closeModal();});},{closable:false,onClose:next});
 }
 function boardWarning(next){
@@ -4574,17 +4579,17 @@ function kpis(){
   return [{k:'승률',v:wr,t:'목표 50%',s:st(wr,50,40)},{k:'관중 점유율',v:att,t:'목표 70%',s:st(att,70,50)},{k:'영업이익률',v:margin,t:'목표 10%',s:st(margin,10,0)},
     {k:'팬 증가율',v:S.results.length?fg:null,t:'시즌 +35%',s:S.results.length?st(fg,35*wk,10*wk):'na'},{k:'연봉 비율',v:ratio,t:'매출 대비 ≤50%',s:st(ratio,50,60,true)}];
 }
-const kpiHTML=()=>`<div class="kpis">${kpis().map(k=>`<div class="kpi ${k.s}"><span>${k.k}</span><b>${k.v===null?'—':(k.v>0&&k.k==='팬 증가율'?'+':'')+Math.round(k.v)+'%'}</b><span>${ST_KO[k.s]} · ${k.t}</span></div>`).join('')}</div>`;
+const kpiHTML=()=>`<div class="kpis">${kpis().map(k=>`<div class="kpi ${k.s}"><span>${k.k}</span><b>${k.v===null?'-':(k.v>0&&k.k==='팬 증가율'?'+':'')+Math.round(k.v)+'%'}</b><span>${ST_KO[k.s]} · ${k.t}</span></div>`).join('')}</div>`;
 function briefing(){const K=Object.fromEntries(kpis().map(k=>[k.k,k]));const out=[];
-  if(S.trust<35)out.push(['bad',`이사회 신임 ${S.trust} — 위험 구간. 시즌 목표 중 달성 가능한 항목에 집중 필요`]);
-  if(K['연봉 비율'].s==='bad')out.push(['bad','연봉 비율 경고 — 매출 대비 인건비 과다. 스폰서 확대 또는 고연봉 선수 정리 검토']);
-  if(K['영업이익률'].s==='bad')out.push(['bad','적자 운영 중 — 시설·스태프 투자 속도 조절 필요']);
-  if(K['관중 점유율'].s!=='ok'&&K['관중 점유율'].s!=='na')out.push(['warn','관중 점유율 저조 — 티켓가 인하 또는 마케터 고용으로 수요 확대']);
-  if(K['관중 점유율'].v!==null&&K['관중 점유율'].v>=92&&S.fac.stand<3)out.push(['ok','관중석 만석 근접 — 증설 시 홈경기 수입 확대 여지 큼']);
-  const tired=S.players.filter(p=>p.cond<50||p.inj).length;if(tired)out.push(['warn',`컨디션 저하·부상 ${tired}명 — 강훈련 자제, 물리치료 검토`]);
-  const exp=S.players.filter(p=>p.contract<=1).length;if(exp)out.push(['warn',`계약 만료 예정 ${exp}명 — 시즌 종료 시 재계약 협상`]);
-  const lowM=S.players.filter(p=>p.morale<35).length;if(lowM)out.push(['warn',`사기 저하 ${lowM}명 — 출전 기회 부여 또는 연봉 조정 필요 (이적 요청 위험)`]);
-  if(!out.length)out.push(['ok','전 지표 정상 범위 — 현 운영 기조 유지']);return out.slice(0,4);}
+  if(S.trust<35)out.push(['bad',`이사회 신임 ${S.trust}, 위험 구간. 시즌 목표 중 달성 가능한 항목에 집중 필요`]);
+  if(K['연봉 비율'].s==='bad')out.push(['bad','연봉 비율 경고: 매출 대비 인건비 과다. 스폰서 확대 또는 고연봉 선수 정리 검토']);
+  if(K['영업이익률'].s==='bad')out.push(['bad','적자 운영 중: 시설·스태프 투자 속도 조절 필요']);
+  if(K['관중 점유율'].s!=='ok'&&K['관중 점유율'].s!=='na')out.push(['warn','관중 점유율 저조: 티켓가 인하 또는 마케터 고용으로 수요 확대']);
+  if(K['관중 점유율'].v!==null&&K['관중 점유율'].v>=92&&S.fac.stand<3)out.push(['ok','관중석 만석 근접: 증설 시 홈경기 수입 확대 여지 큼']);
+  const tired=S.players.filter(p=>p.cond<50||p.inj).length;if(tired)out.push(['warn',`컨디션 저하·부상 ${tired}명: 강훈련 자제, 물리치료 검토`]);
+  const exp=S.players.filter(p=>p.contract<=1).length;if(exp)out.push(['warn',`계약 만료 예정 ${exp}명: 시즌 종료 시 재계약 협상`]);
+  const lowM=S.players.filter(p=>p.morale<35).length;if(lowM)out.push(['warn',`사기 저하 ${lowM}명: 출전 기회 부여 또는 연봉 조정 필요 (이적 요청 위험)`]);
+  if(!out.length)out.push(['ok','전 지표 정상 범위: 현 운영 기조 유지']);return out.slice(0,4);}
 function seasonEnd(){
   const st=standings();const rank=st.findIndex(c=>c.i===0)+1;const champ=rank===1;const me=S.clubs[0];
   if(S.merch.stock>0){money('merch',S.merch.stock*.6,'굿즈 재고 처분');S.merch.stock=0;}
@@ -4611,16 +4616,16 @@ function boardEval(next){
     <div class="scroll-x"><table class="tbl"><thead><tr><th class="l">목표</th><th>기준</th><th>실적</th><th>결과</th></tr></thead><tbody>
     ${gs.map(g=>`<tr><td class="l">${g.ko}</td><td>${g.tgt}</td><td>${g.cur}</td><td><span class="pill ${g.ok?'good':'hot'}">${g.ok?'달성':'미달'}</span></td></tr>`).join('')}</tbody></table></div>
     <div class="notice ${dT<0?'bad':''}">이사회 신임 ${dT>=0?'+':''}${dT} → ${S.trust}${S.lastRank===1?' (우승 보너스 포함)':''} · 예산 ${dB>=0?'+':''}${won(dB)}</div>
-    ${S.trust<=0?'<div class="notice bad">신임도 0 — 해임 통보</div>':''}
+    ${S.trust<=0?'<div class="notice bad">신임도 0: 해임 통보</div>':''}
     <button class="btn block" data-close>${S.trust<=0?'결과 확인':'다음'}</button>`,null,{closable:false,onClose:()=>{if(S.trust<=0)fired();else next();}});
 }
 function sponsorSettle(next){
   const avgAtt=S.attHist.length?sum(S.attHist)/S.attHist.length:0;const rows=[...kpiSeasonRows()];
   S.sponsors.forEach(s=>{if(s.cond&&!s._quit){const met=s.cond.type==='rank'?S.lastRank<=s.cond.target:s.cond.type==='adv'?(S.seasonAdvWins||0)>=s.cond.target:avgAtt>=s.cond.target;
-      if(met)money('bonus',s.cond.bonus,`${s.name} 조건 보너스`);rows.push(`${esc(s.name)}: ${s.cond.ko} — ${met?`<span class="pos">달성 +${s.cond.bonus}만</span>`:'<span class="neg">미달</span>'}`);}
-    if(s._quit)return;s.left--;if(s.left<=0){const R=kpiRenewal(s);if(R.drop){rows.push(`${esc(s.name)}: 계약 만료 — <span class="neg">노출 실적 부족으로 재계약 거절</span>`);return;}
+      if(met)money('bonus',s.cond.bonus,`${s.name} 조건 보너스`);rows.push(`${esc(s.name)}: ${s.cond.ko}, ${met?`<span class="pos">달성 +${s.cond.bonus}만</span>`:'<span class="neg">미달</span>'}`);}
+    if(s._quit)return;s.left--;if(s.left<=0){const R=kpiRenewal(s);if(R.drop){rows.push(`${esc(s.name)}: 계약 만료, <span class="neg">노출 실적 부족으로 재계약 거절</span>`);return;}
       const ef=Math.round(R.f*(S.lastRank<=3?1.05:1)*(S.record.titles?1.05:1)*100)/100;const nw=Math.round(s.weekly*ef);
-      S.spOffers=(S.spOffers||[]).filter(o=>o.name!==s.name);S.spOffers.unshift({name:s.name,en:s.en,slot:s.slot,cond:s.cond,weekly:nw,left:SLOTS[s.slot].left,renewal:true,ef});rows.push(`${esc(s.name)}: 계약 만료 — <b>재계약 제안 주 ${nw}만</b> (달성률 반영 ×${ef})`);
+      S.spOffers=(S.spOffers||[]).filter(o=>o.name!==s.name);S.spOffers.unshift({name:s.name,en:s.en,slot:s.slot,cond:s.cond,weekly:nw,left:SLOTS[s.slot].left,renewal:true,ef});rows.push(`${esc(s.name)}: 계약 만료, <b>재계약 제안 주 ${nw}만</b> (달성률 반영 ×${ef})`);
       if(R.up){const u=kpiUpgradeOffer(s);if(u)rows.push(`<span class="pos">${esc(u)}</span>`);}}});
   S.sponsors=S.sponsors.filter(s=>s.left>0&&!s._quit);kpiResetSeason();save();
   showModal(`<span class="lbl">SPONSOR SETTLEMENT</span><h2 class="h">스폰서 정산 · 노출 목표 대비 달성률</h2>${rows.length?rows.map(r=>`<div class="notice">${r}</div>`).join(''):'<p class="muted">정산할 스폰서 계약 없음</p>'}
@@ -4676,7 +4681,7 @@ function finishTraining(){
       <div class="big" style="text-align:left">${t.score}<span class="small muted" style="font-family:var(--f-body)"> 점</span></div>
       <div><b>${STAT_KO[def.stat]}</b> ${before.toFixed(1)} → <b class="pos">${after.toFixed(1)}</b> ${after>=capOf(t.pl)?'<span class="pill hot">재능 한계</span>':`<span class="pill good">+${r1(after-before).toFixed(1)}</span>`}</div>
       <div class="small muted">컨디션 -${it.cond} → ${t.pl.cond}${S.fac.train?` · 훈련장 +${S.fac.train*15}%`:''}${S.staff.coach?' · 수석코치 ×1.2':''}</div></div></div>
-    ${injured?'<div class="notice bad">강훈련 중 부상 발생 — 이번 주 출전·훈련 불가</div>':''}${msgs.map(m=>`<div class="lvup">★ ${esc(m)}</div>`).join('')}
+    ${injured?'<div class="notice bad">강훈련 중 부상 발생: 이번 주 출전·훈련 불가</div>':''}${msgs.map(m=>`<div class="lvup">★ ${esc(m)}</div>`).join('')}
     <button class="btn block" data-close>확인</button>`);
 }
 
@@ -4689,7 +4694,7 @@ function answerBid(oid,ok){const o=S.offers.find(x=>x.id===oid);if(!o)return;con
 function hireStaff(k){const s=STAFF[k];if(S.staff[k]||S.budget<s.salary*2)return;money('staff',-s.salary*2,`${s.ko} 계약금`);S.staff[k]=true;if(k==='marketer')genSponsorOffers();sfx('coin');save();renderAll();}
 function fireStaff(k){const s=STAFF[k];if(!S.staff[k])return;money('staff',-s.salary*2,`${s.ko} 해지 위약금`);S.staff[k]=false;save();renderAll();}
 function upgradeFac(k){const lv=S.fac[k];if(lv>=3)return;const c=FAC_COST[lv];if(S.budget<c)return;money('facility',-c,`${FAC[k].ko} Lv${lv+1} 투자`);S.fac[k]++;arenaCache.clear();sfx('coin');save();renderAll();}
-function acceptSponsor(i){const o=S.spOffers[i];if(!o||slotUsed(o.slot)>=SLOTS[o.slot].cap)return;const c={...o};delete c.renewal;delete c.ef;delete c.upgrade;c.kpi=null;kpiInit(c);S.sponsors.push(c);S.spOffers.splice(i,1);arenaCache.clear();sfx('coin');toast(`${o.name} — ${SLOTS[o.slot].ko} 계약 · 경기장에 즉시 반영`);save();renderAll();}
+function acceptSponsor(i){const o=S.spOffers[i];if(!o||slotUsed(o.slot)>=SLOTS[o.slot].cap)return;const c={...o};delete c.renewal;delete c.ef;delete c.upgrade;c.kpi=null;kpiInit(c);S.sponsors.push(c);S.spOffers.splice(i,1);arenaCache.clear();sfx('coin');toast(`${o.name}: ${SLOTS[o.slot].ko} 계약 · 경기장에 즉시 반영`);save();renderAll();}
 function dropSponsor(i){const s=S.sponsors[i];if(!s)return;money('other',-s.weekly*3,`${s.name} 중도 해지 위약금`);S.sponsors.splice(i,1);arenaCache.clear();save();renderAll();}
 function produceMerch(n){const c=n*.5;if(S.budget<c)return;money('merch',-c,`굿즈 ${n}개 생산`);S.merch.stock+=n;sfx('coin');save();renderAll();}
 function setTicket(v){S.ticket=clamp(v,5,20);save();renderClub();}
@@ -4734,7 +4739,7 @@ function kpiRenewal(s){const a=s._ach??1;return {f:kpiFactor(a),drop:a<.6&&Math.
 function kpiResetSeason(){for(const s of S.sponsors){s.kpi={target:SLOT_TGT[s.slot],exp:0,log:[],startW:1};delete s._ach;}}
 // 상위 슬롯 승격 제안 (달성률 130% 이상)
 function kpiUpgradeOffer(s){const i=SLOT_ORDER.indexOf(s.slot);for(let j=i+1;j<SLOT_ORDER.length;j++){const sl=SLOT_ORDER[j];if(slotUsed(sl)>=SLOTS[sl].cap)continue;const pool=SPONSOR_POOL[sl].filter(x=>!S.sponsors.some(y=>y.name===x[0])&&!(S.spOffers||[]).some(o=>o.name===x[0]));if(!pool.length)continue;
-  const [name,en]=pick(pool);const D=SLOTS[sl];S.spOffers.unshift({name,en,slot:sl,weekly:D.max,left:D.left,cond:null,upgrade:true});return `${name}(${D.ko}) 승격 제안 도착 — 노출 실적 인정`;}return null;}
+  const [name,en]=pick(pool);const D=SLOTS[sl];S.spOffers.unshift({name,en,slot:sl,weekly:D.max,left:D.left,cond:null,upgrade:true});return `${name}(${D.ko}) 승격 제안 도착: 노출 실적 인정`;}return null;}
 /* ----- 주간 스폰서 미션 ----- */
 const SP_MISSIONS=[{type:'special',n:1,ko:'필살기 1회 이상 발동'},{type:'rally',n:3,ko:'8구 이상 랠리 3회'},{type:'perfect',n:6,ko:'PERFECT 판정 6회'},{type:'win',n:1,ko:'승리'}];
 function genSpMission(){S.spMission=null;if(!S.sponsors.length||Math.random()<.45)return;const s=pick(S.sponsors);const m=pick(SP_MISSIONS);S.spMission={...m,name:s.name,en:s.en,bonus:Math.round(15+s.weekly*1.5),week:S.week};}
@@ -4941,7 +4946,7 @@ const PR_KEYS=[['base','① 기준 캐릭터 시트'],['card','선수 카드 · 
 function artPrompt(p,uni,key){const A=PR_ACE[p.name]||{};const SP=PR_SP[p.name]||['crouched wind-up, paddle drawn back','smash connecting with a glowing ball, bright impact flash','follow-through, paddle swung across the body'];
   const D=artDesc(p,uni);const tail='Solid flat #00FF00 green background (for chroma key), no text, no logos, 3:4 portrait, full body visible.';const col=STYLE_COL[p.style]||'#ffd23f';
   const ref='Use the attached character reference sheet: keep the exact same face, hairstyle, body shape, outfit and colors.';
-  const edit=(chg)=>`Edit the attached image (frame 1). Keep everything identical — character, outfit, colors, camera angle, framing, lighting and background — and change only this: ${chg}. Output the same resolution and composition so the frames line up.`;
+  const edit=(chg)=>`Edit the attached image (frame 1). Keep everything identical: character, outfit, colors, camera angle, framing, lighting and background, and change only this: ${chg}. Output the same resolution and composition so the frames line up.`;
   switch(key){
     case 'base':return `Character reference sheet for an original Korean table-tennis fighting-game character: ${D}. Front view, neutral standing pose, arms slightly away from the body, full body from head to shoes, even lighting. ${PR_STYLE}. ${tail} Original design, not based on any existing character.`;
     case 'card':return `${ref} Character-select key art: confident 3/4 pose, ${A.card||'holding the paddle up'}. Rim light in ${col}. ${PR_STYLE}. ${tail}`;
@@ -4980,7 +4985,7 @@ function openArtPack(sel){
       $('#apBi').onchange=e=>{ART.bi=e.target.checked;try{localStorage.setItem('pm.art.bi',ART.bi?'1':'0');}catch(_){}artBump();renderAll();render();};
       $('#apIg').onchange=e=>{ART.ig=e.target.checked;try{localStorage.setItem('pm.art.ig',ART.ig?'1':'0');}catch(_){}};
       $('#apPix').onchange=e=>{ART.pix=e.target.checked;try{localStorage.setItem('pm.art.pix',ART.pix?'1':'0');}catch(_){}artBump();renderAll();};
-      mbox.querySelectorAll('[data-ap]').forEach(inp=>inp.onchange=async()=>{const f=inp.files&&inp.files[0];if(!f)return;try{const r=await artPrep(f,inp.dataset.ap);await artPut(cur.who+'|'+inp.dataset.ap,r.b);toast(r.keyed?'녹색 배경 제거 후 등록 완료':'원화 등록 완료');renderAll();render();}catch(e){toast('저장 실패 — 이미지 형식이나 저장 공간을 확인');}});
+      mbox.querySelectorAll('[data-ap]').forEach(inp=>inp.onchange=async()=>{const f=inp.files&&inp.files[0];if(!f)return;try{const r=await artPrep(f,inp.dataset.ap);await artPut(cur.who+'|'+inp.dataset.ap,r.b);toast(r.keyed?'녹색 배경 제거 후 등록 완료':'원화 등록 완료');renderAll();render();}catch(e){toast('저장 실패: 이미지 형식이나 저장 공간을 확인');}});
       mbox.querySelectorAll('[data-apdel]').forEach(b=>b.onclick=async()=>{await artDel(cur.who+'|'+b.dataset.apdel);toast('삭제됨');renderAll();render();});
       $('#apCopy').onclick=()=>{const ta=$('#apPrompt');try{navigator.clipboard.writeText(ta.value).then(()=>toast('프롬프트 복사됨'),()=>{ta.select();toast('텍스트를 길게 눌러 복사');});}catch(e){ta.select();}};});};
   render();}
@@ -5920,7 +5925,7 @@ function renderTitle(){
   const saved=load();const el=$('#scr-title');let city=titleAnim.city||'seoul';
   const nameFor=k=>CITY[k].club;
   el.innerHTML=`<h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">핑마스터 Ping Master</h1>
-    <button class="titlebtn" id="btnTitle" aria-label="게임 시작 — 팀 선택으로 이동">${titleHD()?'<canvas class="title-art hd" id="titleArt" width="360" height="540"></canvas>':'<canvas class="px title-art" id="titleArt" width="320" height="240"></canvas>'}</button>
+    <button class="titlebtn" id="btnTitle" aria-label="게임 시작, 팀 선택으로 이동">${titleHD()?'<canvas class="title-art hd" id="titleArt" width="360" height="540"></canvas>':'<canvas class="px title-art" id="titleArt" width="320" height="240"></canvas>'}</button>
     ${saved&&!saved.over?`<div class="box" id="saveBox"><span class="lbl">SAVE DATA</span><b>${esc(saved.club.name)}</b><span class="small muted">${CITY[saved.city].ko} · 시즌 ${saved.season} · WEEK ${saved.week}/14 · 예산 ${fmt(saved.budget)}만 · 신임 ${saved.trust}</span>
       <button class="btn block" id="btnCont">이어하기</button></div>`:''}
     <p class="tapnote" id="tapNote">화면을 누르면 팀 선택으로 이동</p>
@@ -5934,7 +5939,7 @@ function renderTitle(){
       <div>· 경기마다 <b>베이직</b>(자동 이동 + 4버튼) / <b>어드밴스드</b>(드래그 이동 + 스와이프, 보상 ×1.6) 선택</div>
       <div>· 공 궤적 색으로 회전 판단: <span style="color:#ff7a4a">주황 = 상회전</span>, <span style="color:#6aaaff">파랑 = 하회전</span>, <span style="color:#7ae04a">연두 = 횡회전</span>, 흰색 = 무회전</div>
       <div>· 서브: 상대 코트를 탭해 목표 지정 · 내 코트를 드래그해 위치 이동 · 버튼을 꾹 눌러 노란 구간에서 떼기</div>
-      <div>· 선수마다 시그니처 서브가 있음 — ★ 주특기 회전으로 넣으면 보너스</div>
+      <div>· 선수마다 시그니처 서브가 있음: ★ 주특기 회전으로 넣으면 보너스</div>
       <div>· PERFECT 스매시·3구 공격·게임 획득 시 선수가 돌아서서 세리머니</div>
       <div>· 이사회 목표(순위·손익·팬)를 지키지 못해 신임도가 0이 되면 해임</div>
       <div class="muted">PC: 1~4 타격 · SPACE 서브 · Q 필살기 · ←→ 이동(어드밴스드)</div></details>`;
@@ -5944,8 +5949,8 @@ function renderTitle(){
       <span class="small">"${esc(a.story)}"</span>
       <span class="tiny muted">${STYLES[a.style].ko} · ${a.hand==='L'?'왼손':'오른손'} · ${GRIPS[a.grip].ko} · ${RUBBERS[a.rubber].ko} · ${BODY[a.look.body].ko}</span></div></div>
       <div class="stats mini">${Object.keys(STAT_KO).map(k=>`<span>${STAT_KO[k]}</span><div class="bar"><i style="width:${a.stats[k]*10}%"></i></div><b>${a.stats[k].toFixed(1)}</b>`).join('')}</div>
-      <div class="notice"><b>시그니처 서브</b> ${esc(SV.ko)} — ${esc(SV.desc)}</div>
-      <div class="tiny"><span class="pos">강함: ${av.up.join(', ')||'—'}</span> · <span class="neg">약함: ${av.dn.join(', ')||'—'}</span></div>
+      <div class="notice"><b>시그니처 서브</b> ${esc(SV.ko)}: ${esc(SV.desc)}</div>
+      <div class="tiny"><span class="pos">강함: ${av.up.join(', ')||'없음'}</span> · <span class="neg">약함: ${av.dn.join(', ')||'없음'}</span></div>
       <div class="tiny muted">팀 보너스: ${BONUS_KO[c.bonus]} · 홈: ${ARENA_NAME[c.k]} · 마스코트 ${MASCOTS[c.k].name}</div>`;
     titleAnim.city=city;hydrateArt(el);};
   $('#clubName').value=nameFor(city);info();hydrateArt(el);startTitleAnim();
@@ -5960,13 +5965,13 @@ function renderTitle(){
   if(saved&&!saved.over)$('#btnCont').onclick=()=>{titleAnim.phase='title';S=saved;S.tab='home';Music.play('office');renderAll();};
 }
 function alertsHTML(){const a=[];
-  if(S.budget<0)a.push(['bad',`예산 적자 ${won(S.budget)} — 매주 이사회 신임 하락`]);
-  if(S.trust<30)a.push(['bad',`이사회 신임 ${S.trust} — 해임 위험`]);
-  if(S.offers.length)a.push(['',`이적 제안 ${S.offers.length}건 도착 — 시장 탭`]);
+  if(S.budget<0)a.push(['bad',`예산 적자 ${won(S.budget)}, 매주 이사회 신임 하락`]);
+  if(S.trust<30)a.push(['bad',`이사회 신임 ${S.trust}, 해임 위험`]);
+  if(S.offers.length)a.push(['',`이적 제안 ${S.offers.length}건 도착 (시장 탭)`]);
   if(isWindow()&&S.players.length<6)a.push(['',`이적시장 개방 중 (W${S.week<=2?'1~2':'7~8'})`]);
   const inj=S.players.filter(p=>p.inj).map(p=>p.name);if(inj.length)a.push(['bad',`부상: ${inj.join(', ')}`]);
-  if(S.spOffers.length)a.push(['',`스폰서 제안 ${S.spOffers.length}건 도착 — 구단 탭 (광고판·바닥·유니폼 등 노출 위치별)`]);
-  return a.slice(0,2).map(([c,t])=>`<div class="notice ${c}">${esc(t)}</div>`).join('')+(a.length>2?`<div class="tiny muted">외 알림 ${a.length-2}건 — 구단 · 시장 탭 확인</div>`:'');}
+  if(S.spOffers.length)a.push(['',`스폰서 제안 ${S.spOffers.length}건 도착. 구단 탭 (광고판·바닥·유니폼 등 노출 위치별)`]);
+  return a.slice(0,2).map(([c,t])=>`<div class="notice ${c}">${esc(t)}</div>`).join('')+(a.length>2?`<div class="tiny muted">외 알림 ${a.length-2}건 (구단 · 시장 탭 확인)</div>`:'');}
 function renderHome(){
   const mm=myMatch();const oi=mm.opp;const op=S.clubs[oi];const oc=CITY[op.city];const me=S.clubs[0];const last=S.results[S.results.length-1];
   const arena=clubCity(mm.homeIdx);const rank=myRank();const best=[...S.players].filter(p=>p.inj===0).sort((a,b)=>ovr(b)-ovr(a))[0]||S.players[0];const ace=oppOf(oi);const aff=affinity(best,ace);
@@ -5984,7 +5989,7 @@ function renderHome(){
     <span class="tiny muted" style="text-align:center">상대 출전 ${esc(ace.name)} · ${STYLES[ace.style].ko} · ${ace.hand==='L'?'왼손':'오른손'} ${GRIPS[ace.grip].ko} · ${RUBBERS[ace.rubber].ko}</span>
     <div class="row sb"><div class="roster">${rigHTML({...ace,uni:clubUni(oi)})}<div class="col g4"><b>${esc(ace.name)} <span class="tiny muted">${esc(ace.arch)} · ${ace.age}세</span></b><span class="tiny">"${esc(ace.story)}"</span><span class="tiny muted">시그니처 서브: ${SERVES[ace.serve].ko}</span></div></div>
       <div class="col g4" style="align-items:flex-end"><span class="tiny muted">${oc.concept} · ${MASCOTS[oc.k].name}</span>${affPill(aff)}</div></div>
-    ${S.staff.analyst?`<div class="notice"><b>전력분석 리포트</b> — 약점: <b>${SPIN_KO[ace.weak]}</b> 처리 미숙 · 서브 습관: ${Object.entries(ace.habit).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${SPIN_KO[k]} ${Math.round(v*100)}%`).join(', ')}${ace.grip==='pen'?' · 펜홀더 백핸드 약점 (자동 공략)':''}${ace.rubber==='long'?' · 롱핌플: 회전 반전 주의':''}</div>`:'<div class="tiny muted">전력분석관을 고용하면 상대 약점과 서브 습관이 공개됨</div>'}
+    ${S.staff.analyst?`<div class="notice"><b>전력분석 리포트</b> 약점: <b>${SPIN_KO[ace.weak]}</b> 처리 미숙 · 서브 습관: ${Object.entries(ace.habit).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${SPIN_KO[k]} ${Math.round(v*100)}%`).join(', ')}${ace.grip==='pen'?' · 펜홀더 백핸드 약점 (자동 공략)':''}${ace.rubber==='long'?' · 롱핌플: 회전 반전 주의':''}</div>`:'<div class="tiny muted">전력분석관을 고용하면 상대 약점과 서브 습관이 공개됨</div>'}
     ${S.spMission&&S.spMission.week===S.week?`<div class="notice"><b>스폰서 미션</b> · ${esc(S.spMission.name)}: "${esc(S.spMission.ko)}" 달성 시 <b>+${S.spMission.bonus}만</b> · 노출량 +3</div>`:''}
   </div>
   <div class="box" data-tab="훈련"><div class="row sb"><span class="lbl">THIS WEEK TRAINING</span><div class="dots">${[0,1].map(i=>`<i class="${i<S.trainLeft?'on':''}"></i>`).join('')}</div></div>
@@ -5994,7 +5999,7 @@ function renderHome(){
   <div class="col g6" data-tab="소식">${alertsHTML()}${typeof missionsHTML==='function'?missionsHTML():''}</div>
   ${last?`<div class="box small" data-tab="소식"><span class="lbl">LAST MATCH</span><div><span class="pill ${last.won?'good':'hot'}">${last.won?'승':'패'}</span> W${last.week} vs ${esc(S.clubs[last.opp].name)} · ${last.games.join(':')} (${last.log.map(s=>s.join('-')).join(', ')}) · ${last.mode==='adv'?'어드밴스드':'베이직'}</div></div>`:''}`;
   hydrateArt(el);
-  const tip={allround:'빈틈 적은 균형형 — PERFECT 비율이 승부',attack:'상회전 강타가 많음 — 블록으로 안정 후 역습',speed:'왼손 속공, 공이 빠름 — 링을 일찍 주시',defense:'펜홀더 포핸드 강타 — 백핸드 쪽 공략',control:'구석을 집요하게 공략 — 리치·스피드 높은 선수 추천',cut:'강한 하회전 커트 — 커트로 버티다 PERFECT 드라이브',tricky:'롱핌플이 회전을 뒤집음 — 회전 무늬를 끝까지 확인',stamina:'3게임째 강해짐 — 2:0 승부 노리기'}[op.style];
+  const tip={allround:'빈틈 적은 균형형: PERFECT 비율이 승부',attack:'상회전 강타가 많음: 블록으로 안정 후 역습',speed:'왼손 속공, 공이 빠름: 링을 일찍 주시',defense:'펜홀더 포핸드 강타: 백핸드 쪽 공략',control:'구석을 집요하게 공략: 리치·스피드 높은 선수 추천',cut:'강한 하회전 커트: 커트로 버티다 PERFECT 드라이브',tricky:'롱핌플이 회전을 뒤집음: 회전 무늬를 끝까지 확인',stamina:'3게임째 강해짐: 2:0 승부 노리기'}[op.style];
   $('#btnMatch').onclick=()=>chooseMatch(op,ace,tip,oi);
   el.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>chooseTraining(b.dataset.train));
 }
@@ -6006,7 +6011,7 @@ function playerPickHTML(p,sel){return `<button class="pick" data-pid="${p.id}" a
 const affPill=a=>`<span class="aff ${a.total>.2?'up':a.total<-.2?'down':'even'}">${a.total>.2?'▲ 유리':a.total<-.2?'▼ 불리':'＝ 호각'} ${a.total>0?'+':''}${a.total}</span>`;
 function chooseMatch(op,ace,tip,oi){
   let sel=([...S.players].filter(p=>!p.inj).sort((a,b)=>ovr(b)-ovr(a))[0]||{}).id,gm=S.lastMode||'basic';
-  const render=()=>{showModal(`<span class="lbl">MATCH SETUP</span><h2 class="h">vs ${esc(op.name)}</h2><div class="notice">${esc(ace.name)} — ${tip}</div>
+  const render=()=>{showModal(`<span class="lbl">MATCH SETUP</span><h2 class="h">vs ${esc(op.name)}</h2><div class="notice">${esc(ace.name)}: ${tip}</div>
     <span class="small">경기 모드</span>
     <div class="seg" style="--n:2"><button data-m="basic" aria-pressed="${gm==='basic'}">베이직<small>자동 이동 · 4버튼 · 추천 버튼 표시</small></button><button data-m="adv" aria-pressed="${gm==='adv'}">어드밴스드<small>드래그·스와이프 · 판정 좁음<br>승리 상금 ×1.6 · EXP ×1.4 · 팬 ×1.5 · 명성 +2</small></button></div>
     ${gm==='adv'?'<div class="tiny muted">어드밴스드 패배 시 참가 수당 ×0.6</div>':''}
@@ -6042,21 +6047,21 @@ function renderSquad(){
       <span>EXP</span><div class="bar gold"><i style="width:${Math.round(p.exp/expNeed(p.lv)*100)}%"></i></div><span class="tiny muted">${p.exp}/${expNeed(p.lv)}</span>
       <span>컨디션</span><div class="bar ${condBar(p.cond)}"><i style="width:${p.cond}%"></i></div><span class="tiny muted">${p.cond}</span>
       <span>사기</span><div class="bar ${p.morale<35?'bad':p.morale<60?'warn':'good'}"><i style="width:${p.morale}%"></i></div><span class="tiny muted">${p.morale}</span></div>
-    <div class="small"><b>${p.lv>=5?esc(spName(p)):'[잠김] '+esc(sp.ko)+' · Lv5 습득'}</b> <span class="muted">— ${esc(sp.desc)}</span></div>
-    <div class="tiny muted">${STYLES[p.style].ko}: ${STYLES[p.style].desc} · ${GRIPS[p.grip].ko}: ${GRIPS[p.grip].desc} · ${RUBBERS[p.rubber].ko}: ${RUBBERS[p.rubber].desc} · 체형: ${BODY[p.look.body].desc}${p.hand==='L'?' · 왼손잡이: 상대 실수 +4%':''}</div>
+    <div class="spbox"><span class="tiny muted">필살기</span><b>${p.lv>=5?esc(spName(p)):esc(sp.ko)}</b>${p.lv>=5?'':'<span class="pill mut">Lv5에 습득</span>'}<span class="small muted">${esc(sp.desc)}</span></div>
+    <dl class="traits">${[['전형',STYLES[p.style].ko,STYLES[p.style].desc],['그립',GRIPS[p.grip].ko,GRIPS[p.grip].desc],['러버',RUBBERS[p.rubber].ko,RUBBERS[p.rubber].desc],['체형','',BODY[p.look.body].desc]].concat(p.hand==='L'?[['손','왼손잡이','상대 실수 +4%']]:[]).map(([k,n,d])=>`<dt>${k}</dt><dd>${n?`<b>${n}</b> `:''}${d}</dd>`).join('')}</dl>
     ${p.inj>0?'<span class="pill hot" style="align-self:flex-start">부상 · 이번 주 출전 불가</span>':''}
     <div class="row sb"><span class="lbl">STATS · 재능 한계 ${cap.toFixed(1)}</span>${p.pts>0?`<span class="pill gold">포인트 ${p.pts}</span>`:''}</div>
     <div class="stats">${Object.keys(STAT_KO).map(k=>`<span>${STAT_KO[k]}</span><div class="bar"><i style="width:${p.stats[k]*10}%"></i><i class="cap" style="left:${cap*10-1}%"></i></div><b>${p.stats[k].toFixed(1)}</b><button class="plus" data-pt="${p.id}|${k}" ${p.pts<=0||p.stats[k]>=cap?'disabled':''} aria-label="${STAT_KO[k]} 0.5 올리기">+</button>`).join('')}</div>
     <div class="row wrap">${(p.cond<100||p.inj>0)?`<button class="btn ghost sm" data-heal="${p.id}" ${S.budget<(S.staff.medic?15:30)?'disabled':''}>물리치료 (-${S.staff.medic?15:30}만 · 컨디션 +40)</button>`:''}
       <button class="btn ghost sm" data-rel="${p.id}" ${S.players.length<=3?'disabled':''}>방출 (위약금 ${p.salary*2}만)</button>
-      ${p.custom?`<button class="btn ghost sm" data-av="${p.id}">아바타 편집</button>`:''}<label class="btn ghost sm">${p.custom?'포토카드 사진 넣기':'일러스트 이미지 등록'}<input type="file" accept="image/*" data-img="${p.id}" hidden></label>${hasPImg(p.id)?`<button class="btn ghost sm" data-imgclr="${p.id}">기본 일러스트로</button>`:''}</div>
-  </div>`;}).join('')+`<button class="btn ghost block" id="btnArt">아트 팩 · 원화 교체와 제작 프롬프트</button>`;
+      ${p.custom?`<button class="btn ghost sm" data-av="${p.id}">아바타 편집</button>`:''}${p.ace?'':`<label class="btn ghost sm">포토카드 사진 넣기<input type="file" accept="image/*" data-img="${p.id}" hidden></label>`}${hasPImg(p.id)?`<button class="btn ghost sm" data-imgclr="${p.id}">기본 일러스트로</button>`:''}</div>
+  </div>`;}).join('')+(DEV?`<button class="btn ghost block" id="btnArt">[개발] 아트 팩</button>`:'');
   hydrateArt(el);
   el.querySelectorAll('[data-heal]').forEach(b=>b.onclick=()=>healPlayer(+b.dataset.heal));
   el.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>{const [id,k]=b.dataset.pt.split('|');spendPoint(+id,k);});
   el.querySelectorAll('[data-rel]').forEach(b=>{let armed=false;b.onclick=()=>{if(!armed){armed=true;b.textContent='한 번 더 누르면 방출';return;}releasePlayer(+b.dataset.rel);};});
-  $('#btnArt').onclick=()=>openArtPack();
-  el.querySelectorAll('[data-img]').forEach(inp=>inp.onchange=()=>{const f=inp.files&&inp.files[0];if(!f)return;setPImg(+inp.dataset.img,f,ok=>{toast(ok?'일러스트 이미지 등록 완료 — 카드·컷신에 반영':'이미지 저장 실패 (저장 공간 부족)');renderSquad();});});
+  {const ba=$('#btnArt');if(ba)ba.onclick=()=>openArtPack();}
+  el.querySelectorAll('[data-img]').forEach(inp=>inp.onchange=()=>{const f=inp.files&&inp.files[0];if(!f)return;setPImg(+inp.dataset.img,f,ok=>{toast(ok?'사진 등록 완료. 카드와 컷신에 반영됨':'사진 저장 실패 (저장 공간 부족)');renderSquad();});});
   el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{const p=S.players.find(x=>x.id===+b.dataset.av);if(!p)return;openAvatarEditor({player:p,statsLocked:true,title:'AVATAR · 외형 편집',onSave:d=>{Object.assign(p,{name:d.name,look:d.look,style:p.style,hand:d.hand,grip:d.grip,rubber:d.rubber,serve:d.serve});save();renderAll();S.tab='squad';show('squad');}});});
   el.querySelectorAll('[data-imgclr]').forEach(b=>b.onclick=()=>{clearPImg(+b.dataset.imgclr);toast('기본 일러스트로 복원');renderSquad();});
   el.querySelectorAll('[data-card-open]').forEach(b=>b.onclick=()=>{const p=S.players.find(x=>x.id===+b.dataset.cardOpen);if(!p)return;
@@ -6109,9 +6114,9 @@ function renderClub(){
   hydrateArt(el);
   $('#tkDown').onclick=()=>setTicket(S.ticket-1);$('#tkUp').onclick=()=>setTicket(S.ticket+1);
   el.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>acceptSponsor(+b.dataset.sp));
-  el.querySelectorAll('[data-drop]').forEach(b=>{let a=false;b.onclick=()=>{if(!a){a=true;b.textContent=`위약금 ${S.sponsors[+b.dataset.drop].weekly*3}만 — 확인`;return;}dropSponsor(+b.dataset.drop);};});
+  el.querySelectorAll('[data-drop]').forEach(b=>{let a=false;b.onclick=()=>{if(!a){a=true;b.textContent=`위약금 ${S.sponsors[+b.dataset.drop].weekly*3}만, 한 번 더 눌러 확인`;return;}dropSponsor(+b.dataset.drop);};});
   el.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>hireStaff(b.dataset.hire));
-  el.querySelectorAll('[data-fire]').forEach(b=>{let a=false;b.onclick=()=>{if(!a){a=true;b.textContent=`위약금 ${STAFF[b.dataset.fire].salary*2}만 — 확인`;return;}fireStaff(b.dataset.fire);};});
+  el.querySelectorAll('[data-fire]').forEach(b=>{let a=false;b.onclick=()=>{if(!a){a=true;b.textContent=`위약금 ${STAFF[b.dataset.fire].salary*2}만, 한 번 더 눌러 확인`;return;}fireStaff(b.dataset.fire);};});
   el.querySelectorAll('[data-fac]').forEach(b=>b.onclick=()=>upgradeFac(b.dataset.fac));
   el.querySelectorAll('[data-mer]').forEach(b=>b.onclick=()=>produceMerch(+b.dataset.mer));
 }
@@ -6193,7 +6198,7 @@ function openAvatarEditor(opts){
     <div class="avprev" data-nopage><canvas class="avcard" id="avCard" width="180" height="252" role="img" aria-label="도트 카드 미리보기"></canvas><div class="col g4" style="align-items:center"><canvas class="px por lg" id="avPor" width="64" height="64"></canvas><div class="row" style="gap:2px"><canvas class="px rigspr" id="avSpr" width="80" height="100"></canvas><canvas class="px rigspr" id="avBack" width="80" height="100"></canvas></div></div></div>
     <div class="avname"><label class="small" for="avName">이름</label><input class="txt" id="avName" maxlength="8" value="${esc(d.name)}"><button class="btn ghost sm" id="avRnd">무작위</button></div>
     <div class="segtabs" role="tablist"><button type="button" role="tab" data-avt="look" aria-selected="true">외형</button><button type="button" role="tab" data-avt="play" aria-selected="false">플레이</button>${locked?'':'<button type="button" role="tab" data-avt="stat" aria-selected="false">능력치</button>'}</div>
-    <div class="avpane" data-pane="look">${PL?`<div class="avsec"><span class="small">원화 선택</span><div class="avpool">${(ART_MAN.pool||[]).map(k=>`<button type="button" class="avpick" data-pool="${k}" aria-label="${poolKO(k)}"><img src="${assetURL('img/pool/'+k+'_portrait.webp')}" alt=""><i>${poolKO(k)}</i></button>`).join('')}</div></div>
+    <div class="avpane" data-pane="look">${PL?`<div class="avsec"><span class="small">모습 선택</span><div class="avpool">${(ART_MAN.pool||[]).map(k=>`<button type="button" class="avpick" data-pool="${k}" aria-label="${poolKO(k)}"><img src="${assetURL('img/pool/'+k+'_portrait.webp')}" alt=""><i>${poolKO(k)}</i></button>`).join('')}</div></div>
       ${sw('look.hairT',HAIR_TINT.map(c=>c||'#2a2a2a'),'머리색')}${sw('look.pc',PADDLE_COL,'라켓 색')}${sw('look.bd',BAND_COL.map(c=>c||'transparent'),'헤어밴드')}${sw('look.sh',SHORTS_COL.map(c=>c||'#1c2550'),'반바지')}${sw('look.sn',SHOE_COL.map(c=>c||'#b3202a'),'운동화')}<div class="avsec"><label class="small" for="avNum">등번호</label><input class="txt" id="avNum" type="number" inputmode="numeric" min="1" max="99" value="${d.look.num||7}" style="width:90px"></div>`
      :`${chips('look.body',AV_OPTS.body,'체형')}${sw('look.skin',SKINS.map(s=>s[0]),'피부톤')}${chips('look.hair',AV_OPTS.hair,'헤어')}${sw('look.hairC',HAIRS.map(h=>h[0]),'머리색')}
       ${chips('look.eye',AV_OPTS.eye,'눈매')}${sw('look.iris',IRIS,'눈동자')}${chips('look.acc',AV_OPTS.acc,'안경·소품')}${chips('look.gear',AV_OPTS.gear,'모자·장식')}${chips('look.mark',AV_OPTS.mark,'얼굴')}${chips('look.beard',AV_OPTS.beard,'수염')}`}</div>
@@ -6329,7 +6334,7 @@ function renderTitle(){
   const saved=load();const el=$('#scr-title');let city=titleAnim.city||'seoul';const has=saved&&!saved.over;const nameFor=k=>CITY[k].club;
   el.classList.add('tf');
   el.innerHTML=`<h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">핑마스터 Ping Master</h1>
-  <div class="tf-title" id="tfTitle"><button class="titlebtn tf-art" id="btnTitle" aria-label="시작 — 메인 메뉴 열기">${titleHD()||titleWait()?'<canvas class="title-art hd" id="titleArt" width="360" height="540"></canvas>':'<canvas class="px title-art" id="titleArt" width="320" height="240"></canvas>'}</button>
+  <div class="tf-title" id="tfTitle"><button class="titlebtn tf-art" id="btnTitle" aria-label="시작, 메인 메뉴 열기">${titleHD()||titleWait()?'<canvas class="title-art hd" id="titleArt" width="360" height="540"></canvas>':'<canvas class="px title-art" id="titleArt" width="320" height="240"></canvas>'}</button>
     <p class="tapnote" id="tapNote">TAP TO START · 화면을 누르세요</p></div>
   <div class="tf-menu" id="tfMenu" hidden>
     <div class="tf-mlogo">${titleHD()?'':'<b>PING MASTER</b>'}<span>8도시 탁구 리그 · 구단 매니저</span></div>
@@ -6346,7 +6351,7 @@ function renderTitle(){
     <div class="nmcard" id="nmCard"></div>
     <label for="clubName" class="small">클럽 이름 (최대 14자)</label><input class="txt" id="clubName" maxlength="14" autocomplete="off">
     <button class="btn block startbtn" id="btnNew">${has?'창단하기 (기존 저장 삭제)':'&gt; 창단하기 · GAME START'}</button>
-    <div class="small muted" id="newNote">${has?'기존 저장이 있음 — 한 번 더 눌러야 창단이 진행됨':'창단 후 연습생 2명을 고르고 시즌을 시작함'}</div></div>`;
+    <div class="small muted" id="newNote">${has?'기존 저장이 있음: 한 번 더 눌러야 창단이 진행됨':'창단 후 연습생 2명을 고르고 시즌을 시작함'}</div></div>`;
   const info=()=>{const c=CITY[city],a=c.ace;const top=Object.entries(a.stats).sort((x,y)=>y[1]-x[1]).slice(0,3);
     $('#selInfo').innerHTML=`${faceHTML('ace:'+a.name,'selface')||porHTML(a.look,{c:c.c,c2:c.c2,pat:c.pat},'normal','selface')}
       <div class="col g4" style="min-width:0"><span class="lbl">${c.en} · ${esc(c.club)}</span><b class="selname">${esc(a.name)} <small>${esc(a.arch)}</small></b>
@@ -6378,14 +6383,14 @@ function openTeamInfo(k){const c=CITY[k],a=c.ace;const av=advOf(a.style);const S
     <div class="selinfo">${cardHTML(cardInfoCity(k,'fire'),'sel')}<div class="col g4"><span class="small">"${esc(a.story)}"</span>
       <span class="tiny muted">${STYLES[a.style].ko} · ${a.hand==='L'?'왼손':'오른손'} · ${GRIPS[a.grip].ko} · ${RUBBERS[a.rubber].ko} · ${BODY[a.look.body].ko}</span></div></div>
     <div class="stats mini">${Object.keys(STAT_KO).map(s=>`<span>${STAT_KO[s]}</span><div class="bar"><i style="width:${a.stats[s]*10}%"></i></div><b>${a.stats[s].toFixed(1)}</b>`).join('')}</div>
-    <div class="notice"><b>시그니처 서브</b> ${esc(SV.ko)} — ${esc(SV.desc)}</div>
-    <div class="tiny"><span class="pos">강함: ${av.up.join(', ')||'—'}</span> · <span class="neg">약함: ${av.dn.join(', ')||'—'}</span></div>
+    <div class="notice"><b>시그니처 서브</b> ${esc(SV.ko)}: ${esc(SV.desc)}</div>
+    <div class="tiny"><span class="pos">강함: ${av.up.join(', ')||'없음'}</span> · <span class="neg">약함: ${av.dn.join(', ')||'없음'}</span></div>
     <div class="tiny muted">팀 보너스: ${BONUS_KO[c.bonus]} · 홈: ${ARENA_NAME[c.k]} · 마스코트 ${MASCOTS[c.k].name}</div>
     <button class="btn block" data-close>닫기</button>`);}
 function openHowTo(){showModal(`<span class="lbl">HOW TO PLAY · 조작 방법</span>
   <div class="box howpg"><b>경기 모드</b><div class="small">· <b>베이직</b>: 자동 이동 + 4버튼 (드라이브 · 커트 · 블록 · 스매시)</div><div class="small">· <b>어드밴스드</b>: 드래그 이동 + 스와이프 타격 · 보상 ×1.6</div><div class="small">· 공이 링 안에 들어올 때 누르면 PERFECT</div></div>
   <div class="box howpg"><b>회전 읽기</b><div class="small">공 궤적 색으로 회전을 판단함</div><div class="small"><span style="color:#ff7a4a">주황 = 상회전</span> → 블록 · 드라이브</div><div class="small"><span style="color:#6aaaff">파랑 = 하회전</span> → 커트 · 드라이브</div><div class="small"><span style="color:#7ae04a">연두 = 횡회전</span> · 흰색 = 무회전</div></div>
-  <div class="box howpg"><b>서브</b><div class="small">· 상대 코트를 탭해 목표 지정 · 내 코트를 드래그해 위치 이동</div><div class="small">· 버튼을 꾹 눌러 노란 구간에서 떼기</div><div class="small">· 선수마다 시그니처 서브 — ★ 주특기 회전으로 넣으면 보너스</div></div>
+  <div class="box howpg"><b>서브</b><div class="small">· 상대 코트를 탭해 목표 지정 · 내 코트를 드래그해 위치 이동</div><div class="small">· 버튼을 꾹 눌러 노란 구간에서 떼기</div><div class="small">· 선수마다 시그니처 서브: ★ 주특기 회전으로 넣으면 보너스</div></div>
   <div class="box howpg"><b>구단 운영</b><div class="small">· 매주 훈련 2회 → 경기 1회</div><div class="small">· 이사회 목표(순위 · 손익 · 팬)를 지키지 못해 신임도가 0이 되면 해임</div><div class="small">· 스폰서 · 티켓 · 시설 · 스태프로 수입과 성적을 함께 관리</div></div>
   <div class="box howpg"><b>PC 단축키</b><div class="small">1~4 타격 · SPACE 서브 · Q 필살기 · ←→ 이동(어드밴스드) · PageUp/Down 화면 넘김</div></div>
   <button class="btn block" data-close>닫기</button>`);}
@@ -6418,7 +6423,7 @@ function drawTitleWait(g,t){const W=360,H=540;const gr=g.createRadialGradient(W/
   g.save();g.globalCompositeOperation='lighter';for(let i=0;i<3;i++){const a=t*1.4+i*2.1;const x=W/2+Math.cos(a)*90,y=H*.42+Math.sin(a)*40;const lg=g.createRadialGradient(x,y,0,x,y,70);lg.addColorStop(0,'rgba(0,161,222,.25)');lg.addColorStop(1,'rgba(0,161,222,0)');g.fillStyle=lg;g.fillRect(x-70,y-70,140,140);}g.restore();
   strokeText(g,'PING MASTER',W/2,H*.4,44,'#fff',{font:FONT_N,sw:6,grad:['#fffbd0','#ffd23f','#ff9a1a']});
   g.fillStyle='rgba(255,255,255,.18)';g.fillRect(W*.25,H*.52,W*.5,6);g.fillStyle='#00A1DE';const p=(t*.6)%1;g.fillRect(W*.25,H*.52,W*.5*Math.min(1,.15+p*.85),6);
-  g.save();g.font=`700 14px ${FONT_B}`;g.textAlign='center';g.fillStyle='#c9d3f5';g.fillText('원화 불러오는 중…',W/2,H*.52+28);g.restore();}
+  g.save();g.font=`700 14px ${FONT_B}`;g.textAlign='center';g.fillStyle='#c9d3f5';g.fillText('불러오는 중…',W/2,H*.52+28);g.restore();}
 {const _st=startTitleAnim;startTitleAnim=function(){cancelAnimationFrame(titleAnim.raf);titleAnim.t0=performance.now();const step=()=>{const cv2=$('#titleArt');if(!cv2||$('#scr-title').hidden){titleAnim.raf=0;return;}
   const g=cv2.getContext('2d');const tt=(performance.now()-titleAnim.t0)/1000;g.imageSmoothingEnabled=true;
   if(cv2.width===360){if(titleHD())drawTitleHD(g,tt,titleAnim.city||'seoul');else drawTitleWait(g,tt);}else{g.imageSmoothingEnabled=false;drawTitleArt(g,tt,titleAnim.city);}
@@ -6496,7 +6501,7 @@ function feelDt(dt){if(mode!=='match'||!M)return dt;
 /* ----- 3. 첫 경기 손가락 안내 (3단계 · 끝날 때까지 시간 정지) ----- */
 function tutStart(){if(window.__noTut){S.flags.tutDone=true;return;}const play=$('#play');if(!play||play.hidden)return;FEEL.tutOpen=true;const adv=M&&M.mode==='adv';
   const steps=adv?[['#ctrl .pad.move,#ctrl','왼쪽 패드를 좌우로 끌면 선수가 이동함'],['#ctrl .pad.hit,#ctrl','오른쪽 패드를 위로 스와이프 = 드라이브 · 아래 = 커트 · 탭 = 블록'],['#sprow,#gauge','PERFECT로 게이지를 채우면 Lv5부터 필살기 발동']]
-    :[['#cv','코트를 탭하면 선수가 그 자리로 달려감'],['#ctrl','공 위 링이 작아져 공과 겹칠 때 버튼 탭 — 상회전엔 드라이브 · 하회전엔 커트'],['#sprow,#gauge','PERFECT를 모으면 게이지가 참 → Lv5부터 필살기']];
+    :[['#cv','코트를 탭하면 선수가 그 자리로 달려감'],['#ctrl','공 위 링이 작아져 공과 겹칠 때 버튼 탭: 상회전엔 드라이브 · 하회전엔 커트'],['#sprow,#gauge','PERFECT를 모으면 게이지가 참 → Lv5부터 필살기']];
   const el=document.createElement('div');el.id='tut';el.setAttribute('role','dialog');el.setAttribute('aria-label','조작 안내');play.appendChild(el);let i=0;
   const draw=()=>{const [sel,msg]=steps[i];const t=sel.split(',').map(s=>$(s)).find(x=>x&&x.offsetParent);const pr=play.getBoundingClientRect();const r=t?t.getBoundingClientRect():{left:pr.left+pr.width/2-40,top:pr.top+pr.height/2,width:80,height:40};
     const hx=r.left-pr.left+r.width/2,hy=r.top-pr.top+(sel==='#cv'?r.height*.62:r.height/2);
@@ -6581,7 +6586,7 @@ function memDiet(){for(const m of [typeof ARENA_B!=='undefined'&&ARENA_B,typeof 
 // 훈련 화면: 직전 경기 상대 얼굴 숨기고 내 선수 얼굴만
 {const _st=startTraining;startTraining=function(kind,pid,intensity){const out=_st.apply(this,arguments);try{const pl=S.players.find(p=>p.id===pid);const fL=pl&&artFace(artWho(pl));const a=$('#hLf'),b=$('#hRf');a.hidden=!fL;if(fL)a.src=fL.src;b.hidden=true;}catch(e){}return out;};}
 // 설정 화면에 오류 기록 표시
-function diagHTML(){const L=DIAG.list;return `<div class="diag box flat small"><span class="lbl">오류 기록 · 문제가 생기면 이 화면을 캡처해 주세요</span>${L.length?L.map(x=>`<div class="tiny"><b>${esc(x.t)} · ${esc(x.w)}</b> ${esc(x.m)}<br><span class="muted">${esc(x.s)}</span></div>`).join('')+'<button type="button" class="btn ghost" id="diagClr">기록 지우기</button>':'<div class="tiny muted">기록 없음</div>'}</div>`;}
+function diagHTML(){const L=DIAG.list;if(!DEV)return '';return `<div class="diag box flat small"><span class="lbl">[개발] 오류 기록</span>${L.length?L.map(x=>`<div class="tiny"><b>${esc(x.t)} · ${esc(x.w)}</b> ${esc(x.m)}<br><span class="muted">${esc(x.s)}</span></div>`).join('')+'<button type="button" class="btn ghost" id="diagClr">기록 지우기</button>':'<div class="tiny muted">기록 없음</div>'}</div>`;}
 {const _sm=showModal;showModal=function(html,bind,opt){if(typeof html==='string'&&html.startsWith('<span class="lbl">SETTINGS')){html=html.replace('<button class="btn block" data-close>',diagHTML()+'<button class="btn block" data-close>');
   const _b=bind;bind=function(){if(_b)_b.apply(this,arguments);const cl=$('#diagClr');if(cl)cl.onclick=()=>{DIAG.list=[];DIAG.seen.clear();try{localStorage.removeItem('pm.err');}catch(e){}const d=mbox.querySelector('.diag');if(d)d.innerHTML='<span class="lbl">오류 기록</span><div class="tiny muted">기록 없음</div>';};};}
   return _sm.call(this,html,bind,opt);};}
@@ -6721,7 +6726,7 @@ function trAssign(now){const sub=T.sub,el=now-T.start;for(const b of T.balls){if
     const w=tWin(),sub=T.sub;let best=null,bd=9;
     if(sub==='spin'){for(const b of T.balls){const d=Math.abs(CLOCK-(b.t0+b.dur));if(d<bd){bd=d;best=b;}}
       if(!best||bd>w.good){return _lt.call(this,l);}
-      if(best.sp!==l){T.balls.splice(T.balls.indexOf(best),1);T.p.x=T.p.tx=LANES[best.lane]-6;setAnim(T.p,'bh');addPop(T.pops,'틀림 — '+TR_ANS[best.sp],LANES[best.lane],P_BASE-46,'#ff5a6a');sfx('lose');trCombo(false);return;}
+      if(best.sp!==l){T.balls.splice(T.balls.indexOf(best),1);T.p.x=T.p.tx=LANES[best.lane]-6;setAnim(T.p,'bh');addPop(T.pops,'틀림: '+TR_ANS[best.sp],LANES[best.lane],P_BASE-46,'#ff5a6a');sfx('lose');trCombo(false);return;}
       l=best.lane;}
     else{for(const b of T.balls){if(b.lane!==l)continue;const d=Math.abs(CLOCK-(b.t0+b.dur));if(d<bd){bd=d;best=b;}}}
     if(best&&bd<=w.good&&best.k==='bomb'){T.balls.splice(T.balls.indexOf(best),1);T.p.x=T.p.tx=LANES[l]-6;setAnim(T.p,'block');T.score=Math.max(0,T.score-2);addPop(T.pops,'폭탄! -2',LANES[l],P_BASE-46,'#ff5a6a');sfx('lose');trCombo(false);trainHud();return;}
@@ -6763,7 +6768,7 @@ let TR_FIN=null;
       const delta=pl.stats[def.stat]-F.before;let bonus=0;if(G[2]>0&&delta>0){const b0=pl.stats[def.stat];addStat(pl,def.stat,Math.max(.1,delta*G[2]));bonus=r1(pl.stats[def.stat]-b0);}
       if(hasPerk(pl,'rally')){const lost=F.cond0-pl.cond;if(lost>0)pl.cond=Math.min(100,pl.cond+Math.round(lost*.3));}
       pl.tp=pl.tp||{};pl.perks=pl.perks||[];let learned='';
-      if((G[0]==='S'||G[0]==='A')&&PERKS[kind]&&!pl.perks.includes(kind)){pl.tp[kind]=(pl.tp[kind]||0)+(G[0]==='S'?2:1);if(pl.tp[kind]>=PERK_NEED){pl.perks.push(kind);learned=`<div class="lvup">★ 특기 습득: <b>${PERKS[kind][0]}</b> — ${PERKS[kind][1]}</div>`;}}
+      if((G[0]==='S'||G[0]==='A')&&PERKS[kind]&&!pl.perks.includes(kind)){pl.tp[kind]=(pl.tp[kind]||0)+(G[0]==='S'?2:1);if(pl.tp[kind]>=PERK_NEED){pl.perks.push(kind);learned=`<div class="lvup">★ 특기 습득: <b>${PERKS[kind][0]}</b>: ${PERKS[kind][1]}</div>`;}}
       const prog=PERKS[kind]?(pl.perks.includes(kind)?`<span class="pill gold">특기 ${PERKS[kind][0]}</span>`:`<span class="pill mut">특기 '${PERKS[kind][0]}' ${Math.min(PERK_NEED,pl.tp[kind]||0)}/${PERK_NEED}</span>`):'';
       extra=`<div class="trgrade"><b class="trg" style="--gc:${G[3]}">${G[0]}</b><div class="col g4"><div class="row wrap" style="gap:4px">${F.isNew?'<span class="pill hot">NEW RECORD</span>':`<span class="pill mut">최고 ${F.best}점</span>`}${(t.maxCombo||0)>=5?`<span class="pill sky">최대 콤보 ${t.maxCombo}</span>`:''}${bonus>0?`<span class="pill good">등급 보너스 +${bonus.toFixed(1)}</span>`:''}${prog}</div>
         <div class="small">코치: "${pick(TR_SAY[G[0]])}"</div></div></div>${learned}`;
@@ -6790,7 +6795,7 @@ let V18_EV=false,V18_SNAP=null;
 {const _te=triggerEvent;triggerEvent=function(){V18_EV=true;return _te.apply(this,arguments);};}
 function v18Report(changes,snap,done){const dB=S.budget-snap.budget,dF=S.fans-snap.fans;const need=S.players.filter(p=>p.cond<50||p.inj>0);const hot=S.players.filter(p=>formOf(p)>=1),cold=S.players.filter(p=>formOf(p)<=-1);
   const row=p=>{const F=FORM_KO[formOf(p)];return `<div class="row sb wkrow"><span><b>${esc(p.name)}</b> <small class="muted">${GROW[growOf(p)][0]}</small></span><span><span class="pill" style="color:${F[1]};border-color:${F[1]}">${F[2]} ${F[0]}</span> <small class="muted">컨디션 ${p.cond} · 사기 ${p.morale}</small></span></div>`;};
-  const tip=need.length?`${need.map(p=>p.name).join(', ')} — 휴식 또는 약한 강도의 훈련을 권함.`:cold.length?`${cold[0].name}의 기세가 떨어져 있음. 면담이나 출전 기회로 사기를 올려 볼 것.`:hot.length?`${hot[0].name}의 기세가 좋음. 이번 주 경기에 내보내기 좋은 시점.`:'선수단 상태 양호. 강한 훈련으로 밀어붙여도 됨.';
+  const tip=need.length?`${need.map(p=>p.name).join(', ')}: 휴식 또는 약한 강도의 훈련을 권함.`:cold.length?`${cold[0].name}의 기세가 떨어져 있음. 면담이나 출전 기회로 사기를 올려 볼 것.`:hot.length?`${hot[0].name}의 기세가 좋음. 이번 주 경기에 내보내기 좋은 시점.`:'선수단 상태 양호. 강한 훈련으로 밀어붙여도 됨.';
   showModal(`<span class="lbl">WEEKLY REPORT · WEEK ${S.week}</span><h2 class="h">주간 보고</h2>
     <div class="kpis3"><div><small>지난주 손익</small><b class="${dB>=0?'pos':'neg'}">${dB>=0?'+':''}${dB}만</b></div><div><small>보유 자금</small><b>${S.budget}만</b></div><div><small>팬</small><b class="${dF>=0?'pos':'neg'}">${dF>=0?'+':''}${dF}</b></div></div>
     <div class="box" style="padding:8px">${S.players.map(row).join('')}</div>
@@ -6823,7 +6828,7 @@ function v18Event(next){const ps=S.players.filter(p=>!p.inj);if(!ps.length){next
 </script>
 
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611112134').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611132136').catch(()=>{});});}
 // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
 try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
 </script>
