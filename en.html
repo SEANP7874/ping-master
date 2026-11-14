@@ -1,6 +1,6 @@
 <!doctype html>
   <html lang="en"><head><meta charset="utf-8">
-  <script>window.__LF={"ko": "index.html", "en": "en.html", "zh": "zh.html"};(function(){var L="en",w=null;try{w=localStorage.getItem("pm.lang")}catch(e){}if(!w){var n=(navigator.language||"ko").toLowerCase();w=n.indexOf("ko")===0?"ko":n.indexOf("zh")===0?"zh":"en";}if(w!==L&&window.__LF[w])location.replace(window.__LF[w]);})();</script>
+  <script>window.__BUILD="202611140931";window.__LF={"ko": "index.html", "en": "en.html", "zh": "zh.html"};(function(){var L="en",w=null;try{w=localStorage.getItem("pm.lang")}catch(e){}if(!w){var n=(navigator.language||"ko").toLowerCase();w=n.indexOf("ko")===0?"ko":n.indexOf("zh")===0?"zh":"en";}if(w!==L&&window.__LF[w])location.replace(window.__LF[w]);})();</script>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#051766">
   <meta name="mobile-web-app-capable" content="yes">
@@ -6478,7 +6478,7 @@ function openSoundSet(){const draw=()=>showModal(`<span class="lbl">SETTINGS</sp
   <div class="seg" style="--n:2"><button type="button" data-snd="mus" aria-pressed="${musicOn}">Music<small>${musicOn?'On':'Off'}</small></button><button type="button" data-snd="sfx" aria-pressed="${soundOn}">Sound effects<small>${soundOn?'On':'Off'}</small></button></div>
   <span class="small">Match camera</span>
   <div class="seg" style="--n:2"><button type="button" data-cam="1" aria-pressed="${CAMB.feet}">Full view<small>Whole arena · my player full body</small></button><button type="button" data-cam="0" aria-pressed="${!CAMB.feet}">Close view<small>Larger · my player upper body</small></button></div>
-  ${langRow()}<div class="tiny muted">You can also change sound with the ♫ and ♪ buttons at the top</div><button class="btn block" data-close>Close</button>`,()=>{
+  ${langRow()}${verRow()}<div class="tiny muted">You can also change sound with the ♫ and ♪ buttons at the top</div><button class="btn block" data-close>Close</button>`,()=>{
   mbox.querySelectorAll('[data-snd]').forEach(b=>b.onclick=()=>{if(b.dataset.snd==='mus')$('#btnMusic').click();else $('#btnSound').click();draw();});
   mbox.querySelectorAll('[data-cam]').forEach(b=>b.onclick=()=>{CAMB.feet=b.dataset.cam==='1';try{localStorage.setItem('pm.feet',CAMB.feet?'1':'0');}catch(e){}sfx('hit');draw();});});draw();}
 // 오프닝 재생 중에는 배경음악이 겹치지 않게 막음(종료 후 Music.play로 이어짐)
@@ -7054,6 +7054,8 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
    · 언어별 빌드(한국어 · English · 中文)가 따로 있고, 이 값은 빌드할 때 바뀜
    · 설치형 웹앱에서는 설정에서 언어를 바꾸면 해당 언어 파일로 이동함 */
 const LANG='en';
+const APP_VER='v20.2';
+function verRow(){let b='';try{b=window.__BUILD?' · '+window.__BUILD:'';}catch(e){}return `<div class="tiny muted" id="verRow">Version ${APP_VER}${b}</div>`;}
 const LANG_FILES=(typeof window!=='undefined'&&window.__LF&&typeof window.__LF==='object')?window.__LF:null;
 function setLang(l){try{localStorage.setItem('pm.lang',l);}catch(e){}if(LANG_FILES&&LANG_FILES[l]&&l!==LANG)location.replace(LANG_FILES[l]);}
 function langRow(){if(!LANG_FILES)return '';const B=(k,t)=>`<button type="button" data-lang="${k}" aria-pressed="${LANG===k}">${t}</button>`;
@@ -7291,7 +7293,10 @@ const aniGen=()=>!!(M&&M.pl&&!M.pl.ace);
 </script>
 
   <script>
-  if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611140922').catch(()=>{});});}
+  if('serviceWorker' in navigator){const had=!!navigator.serviceWorker.controller;let rl=false;
+    // 새 버전이 준비되면 실행 직후(20초 안, 경기 밖)에는 바로 새로 고침 · 그 뒤에는 다음 실행 때 적용
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{if(rl||!had)return;let inMatch=false;try{inMatch=(typeof mode!=='undefined'&&mode==='match');}catch(e){}if(performance.now()<20000&&!inMatch){rl=true;location.reload();}});
+    window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611140931').then(r=>{try{r.update();}catch(e){}}).catch(()=>{});});}
   // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
   try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
   </script>
