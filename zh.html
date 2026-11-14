@@ -1,6 +1,6 @@
 <!doctype html>
   <html lang="zh-Hans"><head><meta charset="utf-8">
-  <script>window.__BUILD="202611140931";window.__LF={"ko": "index.html", "en": "en.html", "zh": "zh.html"};(function(){var L="zh",w=null;try{w=localStorage.getItem("pm.lang")}catch(e){}if(!w){var n=(navigator.language||"ko").toLowerCase();w=n.indexOf("ko")===0?"ko":n.indexOf("zh")===0?"zh":"en";}if(w!==L&&window.__LF[w])location.replace(window.__LF[w]);})();</script>
+  <script>window.__BUILD="202611141008";window.__LF={"ko": "index.html", "en": "en.html", "zh": "zh.html"};(function(){var L="zh",w=null;try{w=localStorage.getItem("pm.lang")}catch(e){}if(!w){var n=(navigator.language||"ko").toLowerCase();w=n.indexOf("ko")===0?"ko":n.indexOf("zh")===0?"zh":"en";}if(w!==L&&window.__LF[w])location.replace(window.__LF[w]);})();</script>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#051766">
   <meta name="mobile-web-app-capable" content="yes">
@@ -4398,7 +4398,7 @@ function fitCanvas(){
   CH=ch;if(cv.width!==160*RES)cv.width=160*RES;if(cv.height!==CH*RES)cv.height=CH*RES;ctx.setTransform(RES,0,0,RES,0,0);ctx.imageSmoothingEnabled=false;cv.style.width=Math.round(160*scale)+'px';cv.style.height=Math.round(CH*scale)+'px';
   const pb=document.querySelector('.pbot');const rb=(pb?pb.offsetHeight:150)/scale;
   // B안: 상대 머리가 HUD 아래로 보이도록 패널 위 경계(월드 y)를 화면 높이에 맞춰 고름 (짧은 화면은 내 선수를 더 잘라냄)
-  let ypt=236;if(TB.cam){const hud=($('#play .hud')||{}).offsetHeight||60;ypt=clamp(Math.round(CAMB.oHead-4+(CH-rb-hud/scale)),222,262);if(typeof camZoomFit==='function'){const ct=$('#ctrl');const cr=cv.getBoundingClientRect(),tr=ct?ct.getBoundingClientRect():null;const cb=tr&&tr.height?(tr.top-cr.top-46)/scale:CH-rb;camZoomFit(CH,CH-cb,hud/scale);}}
+  let ypt=236;if(TB.cam){const hud=($('#play .hud')||{}).offsetHeight||60;ypt=clamp(Math.round(CAMB.oHead-4+(CH-rb-hud/scale)),222,262);if(typeof camZoomFit==='function'){const pb=$('#play .pbot');const ct=pb||$('#ctrl');const cr=cv.getBoundingClientRect(),tr=ct?ct.getBoundingClientRect():null;const cb=tr&&tr.height?(tr.top-cr.top+(pb?12:-46))/scale:CH-rb;camZoomFit(CH,CH-cb,hud/scale);}}
   WOYT=Math.round(clamp(CH-rb-ypt,-40,A_TOP));if(A_TOP-WOYT+CH>A_H)WOYT=A_TOP+CH-A_H;if(!mode||Math.abs(WOY-WOYT)>200)WOY=WOYT;if(typeof camBgRefresh==='function')camBgRefresh();
 }
 let WOYT=0;const refit=()=>requestAnimationFrame(fitCanvas);
@@ -6999,9 +6999,9 @@ function drawDotActor(g,ch,def,view,size,foot,dx,anim,fi){
 
 // 화면 밖(편집 화면 미리보기 등)에서 원하는 키로 한 프레임 그리기 · 굽지 못한 프레임은 가까운 프레임으로 대신함
 function dotDrawAt(g,def,view,an,t,x,foot,Hpx){if(!RIG_ANIM[an])an='idle';const body=def.look.body;const tm=TEMPO_ANIMS.has(an)?(BODY_TEMPO[body]||1):1;let idx=dotFrameAt(an,t,tm);if(idx<0){an='idle';idx=0;}
-  const d=dotDef(def),sk=dotSizeT(Hpx*(PUP_BODY[body]||1),body);let sp=dotGet(d,view,sk,an,idx,false);
+  const d=dotDef(def),sk=dotSizeT(Hpx*(PUP_BODY[body]||1)/2,body);let sp=dotGet(d,view,sk,an,idx,false);
   if(!sp){dotQueue(d,view,sk,an,idx,false,true);const L=dotFrames(an);for(let k=1;k<L.length&&!sp;k++)sp=dotGet(d,view,sk,an,idx-k,false)||dotGet(d,view,sk,an,idx+k,false);if(!sp)sp=dotGet(d,view,sk,'idle',0,false)||dotMake(d,view,sk,'idle',0,false);}
-  const ds=1;const sm=g.imageSmoothingEnabled;g.imageSmoothingEnabled=true;g.drawImage(sp.img,Math.round(x-sp.w/2*ds+sp.ox*ds),Math.round(foot-sp.fy*ds+sp.oy*ds),sp.cw*ds,sp.ch*ds);g.imageSmoothingEnabled=sm;}
+  const ds=2;const sm=g.imageSmoothingEnabled;g.imageSmoothingEnabled=false;g.drawImage(sp.img,Math.round(x-sp.w/2*ds+sp.ox*ds),Math.round(foot-sp.fy*ds+sp.oy*ds),sp.cw*ds,sp.ch*ds);g.imageSmoothingEnabled=sm;}
 /* ----- 초상: 카드 · 경기와 같은 도트 얼굴 엔진으로 그림 (얼굴 꾸미기가 어디서나 똑같이 보임) ----- */
 const DOT_POR=new Map();
 function dotPortrait(look,uni,expr='normal',N=64){const key=JSON.stringify([look,uni,expr,N]);let c=DOT_POR.get(key);if(c)return c;
@@ -7054,7 +7054,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
    · 언어별 빌드(한국어 · English · 中文)가 따로 있고, 이 값은 빌드할 때 바뀜
    · 설치형 웹앱에서는 설정에서 언어를 바꾸면 해당 언어 파일로 이동함 */
 const LANG='zh';
-const APP_VER='v20.2';
+const APP_VER='v20.3';
 function verRow(){let b='';try{b=window.__BUILD?' · '+window.__BUILD:'';}catch(e){}return `<div class="tiny muted" id="verRow">版本 ${APP_VER}${b}</div>`;}
 const LANG_FILES=(typeof window!=='undefined'&&window.__LF&&typeof window.__LF==='object')?window.__LF:null;
 function setLang(l){try{localStorage.setItem('pm.lang',l);}catch(e){}if(LANG_FILES&&LANG_FILES[l]&&l!==LANG)location.replace(LANG_FILES[l]);}
@@ -7092,7 +7092,8 @@ function aTube(g,pts,rs,flat){const n=pts.length,A=[],B=[];
 function aCel(A,fn,col,o={}){const g=A.g,k=A.u1||1;g.beginPath();fn(g);
   if(o.ink!==0){g.lineWidth=(o.lw||ANI.lw)*2*k;g.strokeStyle=o.inkC||ANI.ink;g.stroke();}
   const d=(o.d==null?1.2:o.d)*k;if(!d){g.fillStyle=col;g.fill();return;}
-  g.fillStyle=o.sh||aShade(col);g.fill();g.save();g.clip();g.translate(-A.lx*d,-ANI.ly*d);g.beginPath();fn(g);g.fillStyle=col;g.fill();g.restore();}
+  g.fillStyle=o.sh||aShade(col);g.fill();g.save();g.clip();g.translate(-A.lx*d,-ANI.ly*d);g.beginPath();fn(g);
+  if(A.rim&&o.rim!==0){g.fillStyle=mixc(col,'#ffffff',.3);g.fill();g.clip();const h=A.rim*k;g.translate(A.lx*(d+h),ANI.ly*(d+h));g.beginPath();fn(g);g.fillStyle=col;g.fill();}else{g.fillStyle=col;g.fill();}g.restore();}
 function aLine(A,fn,w,al=1,col){const g=A.g;g.save();g.globalAlpha=al;g.beginPath();fn(g);g.lineWidth=w;g.strokeStyle=col||ANI.ink;g.stroke();g.restore();}
 
 /* ----- 몸 ----- */
@@ -7205,16 +7206,16 @@ function aFace(A,ex){const g=A.g,L=A.L,B=A.B,big=L.fem===true?1.15:L.fem===false
   if(L.pl){g.save();g.translate(.52,.72);g.rotate(-.4);aCel(A,g=>{g.rect(-.16,-.06,.32,.12);},'#f2d6ae',{d:0,lw:.4});g.restore();}
   const ac=L.acc;if(ac==='glasses'||ac==='squareg'){for(const s of [-1,1]){g.beginPath();if(ac==='glasses')g.arc(s*exx,ey+.02,.31,0,7);else g.rect(s*exx-.32,ey-.22,.64,.46);g.fillStyle='rgba(190,225,255,.2)';g.fill();g.lineWidth=.07;g.strokeStyle=ANI.ink;g.stroke();}aLine(A,g=>{g.moveTo(-exx+.31,ey);g.lineTo(exx-.31,ey);},.06);}
   if(ac==='sportg'){aCel(A,g=>{g.moveTo(-.9,ey-.22);g.quadraticCurveTo(0,ey-.34,.9,ey-.22);g.lineTo(.84,ey+.2);g.quadraticCurveTo(.4,ey+.34,.08,ey+.1);g.lineTo(-.08,ey+.1);g.quadraticCurveTo(-.4,ey+.34,-.84,ey+.2);g.closePath();},'#ffb02a',{d:.6,lw:.5});}}
-function aHead(A,ex){const g=A.g,K=A.K,B=A.B,H=ANI_HAIR[A.L.hair]||ANI_HAIR.sports,hr=B.hr;g.save();g.translate(K.head[0],K.head[1]);g.rotate((A.P.lean||0)*.012);g.scale(hr,hr);const u0=A.u1;A.u1=1/hr;
+function aHead(A,ex){const g=A.g,K=A.K,B=A.B,H=ANI_HAIR[A.L.hair]||ANI_HAIR.sports,hr=B.hr;g.save();g.translate(K.head[0],K.head[1]);g.rotate((A.P.lean||0)*.012);g.scale(hr,hr);const u0=A.u1;A.u1=u0/hr;
   if(A.back){for(const s of [-1,1])aCel(A,g=>{g.ellipse(s*1,.2,.14,.24,0,0,7);},A.skin,{d:.5});aCel(A,g=>{g.ellipse(0,0,1,1.12,0,0,7);},A.skin,{d:1});aHairCap(A,H);aHairBack(A,H);aGear(A,H);}
   else{for(const s of [-1,1])aCel(A,g=>{g.ellipse(s*.99,.3,.15,.25,0,0,7);},A.skin,{d:.5});aCel(A,g=>aFacePath(g,A.L.face,B),A.skin,{d:1.4});if(!H.bald){g.save();g.beginPath();aFacePath(g,A.L.face,B);g.clip();g.translate(0,.11);g.beginPath();aCapPath(g,H,false,B.old);g.fillStyle='rgba(60,30,80,.2)';g.fill();g.restore();}aFace(A,ex);aHairCap(A,H);aGear(A,H);}
   A.u1=u0;g.restore();}
-function aHairBehind(A){const g=A.g,K=A.K,B=A.B,H=ANI_HAIR[A.L.hair]||ANI_HAIR.sports;g.save();g.translate(K.head[0],K.head[1]);g.rotate((A.P.lean||0)*.012);g.scale(B.hr,B.hr);const u0=A.u1;A.u1=1/B.hr;aHairBack(A,H);A.u1=u0;g.restore();}
+function aHairBehind(A){const g=A.g,K=A.K,B=A.B,H=ANI_HAIR[A.L.hair]||ANI_HAIR.sports;g.save();g.translate(K.head[0],K.head[1]);g.rotate((A.P.lean||0)*.012);g.scale(B.hr,B.hr);const u0=A.u1;A.u1=u0/B.hr;aHairBack(A,H);A.u1=u0;g.restore();}
 
 /* ----- 한 사람 그리기: (ox, oy) = 두 발 사이 바닥, s = 배율 ----- */
 function aniDraw(g,def,P,view,s,ox,oy,opt={}){const L=def.look,u=def.uni||{},B=aniBody(L),K=rigSkel(B,P),back=view==='back',mir=(view==='front')!==(def.hand==='L');
   const sk=SKINS[L.skin|0]||SKINS[0];let hp=hairPair(L);if(B.old&&!L.hairX)hp=[mixc(hp[0],'#c8c8d4',.62),mixc(hp[1],'#f4f4fa',.6)];
-  const A={g,L,u,B,K,P,back,mir,u1:1,lx:(mir?-1:1)*ANI.lx,skin:sk[0],skinS:sk[1],hair:hp[0],hairL:hp[1],browC:mixc(hp[0],ANI.ink,.45),jersey:u.c||'#2f8fe8',trim:u.c2||'#1c2a66',shorts:'#27346e',
+  const A={g,L,u,B,K,P,back,mir,u1:opt.px?1.2:1,rim:opt.px?.75:0,lx:(mir?-1:1)*ANI.lx,skin:sk[0],skinS:sk[1],hair:hp[0],hairL:hp[1],browC:mixc(hp[0],ANI.ink,.45),jersey:u.c||'#2f8fe8',trim:u.c2||'#1c2a66',shorts:'#27346e',
     sock:SOCK_C[L.sockC|0]||'#f4f5fa',shoe:SHOE_C[L.shoeC|0]||'#c8283a',pad:PAD_C[L.pc|0]||'#d8283a'};
   // 정면 · 후면에서는 무릎이 옆으로 벌어지지 않게 다리 선 쪽으로 당김 (굽힘은 다리 길이로 표현)
   for(const [h,k,f] of [['hL','kL','fL'],['hR','kR','fR']]){const H=K[h],F=K[f],N=K[k],d=[F[0]-H[0],F[1]-H[1]],m2=d[0]*d[0]+d[1]*d[1]||1,t=((N[0]-H[0])*d[0]+(N[1]-H[1])*d[1])/m2;K[k]=aLp(N,[H[0]+d[0]*t,H[1]+d[1]*t],.62);}
@@ -7249,8 +7250,9 @@ function aGear(A,H){const k=A.L.gear,back=A.back,c=H.c||1.03;if(!k||k==='none')r
 /* ----- 게임 연결: 경기 프레임 굽기 · 초상 · 카드/장면 · 컷인 ----- */
 const ANI_ON=true;const aniStand=B=>B.L+B.T+3.2+B.hr*2.2;
 function aniBake(def,view,sk,pose,bl){const z=PXR_SZ[sk],B=aniBody(def.look),s=z.tgt/aniStand(B);const sk2=z.w+'x'+z.h;let c=ANI_SCR[sk2];if(!c){c=ANI_SCR[sk2]=document.createElement('canvas');c.width=z.w;c.height=z.h;}const g=c.getContext('2d',{willReadFrequently:true});g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,z.w,z.h);const mir=(view==='front')!==(def.hand==='L');
-  const K=aniDraw(g,def,pose,view,s,z.w/2,z.fy,bl?{expr:'blink'}:{});const N=pt=>[z.w/2+(mir?-1:1)*pt[0]*s,z.fy+pt[1]*s];return {img:c,w:z.w,h:z.h,fy:z.fy,lh:N(K.hLl),rh:N(K.hRr)};}
-const ANI_SCR={};try{DOT.frac=.85;DOT.cap=64e6;}catch(e){}
+  const K=aniDraw(g,def,pose,view,s,z.w/2,z.fy,bl?{expr:'blink',px:1}:{px:1});
+  try{const id=g.getImageData(0,0,z.w,z.h),dd=id.data;for(let i=3;i<dd.length;i+=4)dd[i]=dd[i]<110?0:255;g.putImageData(id,0,0);}catch(e){}const N=pt=>[z.w/2+(mir?-1:1)*pt[0]*s,z.fy+pt[1]*s];return {img:c,w:z.w,h:z.h,fy:z.fy,lh:N(K.hLl),rh:N(K.hRr)};}
+const ANI_SCR={};try{DOT.frac=.5;DOT.cap=64e6;}catch(e){}
 const ANI_POR=new Map();
 {const _pp=pixPortrait;pixPortrait=function(look,uni,expr='normal',N=64){const key=JSON.stringify([look,uni,expr,N]);let c=ANI_POR.get(key);if(c)return c;
     try{c=aniPortrait(look,uni,expr==='special'?'fire':expr,N);}catch(e){try{diagLog(e,'ani-por');}catch(_){}return _pp.apply(this,arguments);}
@@ -7296,7 +7298,7 @@ const aniGen=()=>!!(M&&M.pl&&!M.pl.ace);
   if('serviceWorker' in navigator){const had=!!navigator.serviceWorker.controller;let rl=false;
     // 새 버전이 준비되면 실행 직후(20초 안, 경기 밖)에는 바로 새로 고침 · 그 뒤에는 다음 실행 때 적용
     navigator.serviceWorker.addEventListener('controllerchange',()=>{if(rl||!had)return;let inMatch=false;try{inMatch=(typeof mode!=='undefined'&&mode==='match');}catch(e){}if(performance.now()<20000&&!inMatch){rl=true;location.reload();}});
-    window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611140931').then(r=>{try{r.update();}catch(e){}}).catch(()=>{});});}
+    window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611141008').then(r=>{try{r.update();}catch(e){}}).catch(()=>{});});}
   // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
   try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
   </script>
