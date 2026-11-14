@@ -487,6 +487,10 @@ img.por.face.staff{width:48px;height:48px;border-color:var(--line)}
 .wkrow{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);gap:6px;flex-wrap:wrap}.wkrow:last-child{border-bottom:0}
 .awds{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.awd{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;border:2px solid var(--gold,#ffd23f);padding:8px 4px;background:rgba(255,210,63,.07)}.awd img,.awd canvas{max-width:100%}
 [data-train]{word-break:keep-all;padding-left:2px;padding-right:2px;font-size:14px;letter-spacing:-.3px}
+#play .pbot,html.feet #play .pbot{background:linear-gradient(180deg,rgba(6,11,41,0) 0,rgba(6,11,41,.92) 18px,#081038 54px,#050a24 100%);padding-top:28px}
+#play .pbot::before{content:"";position:absolute;left:0;right:0;top:17px;height:2px;background:linear-gradient(90deg,rgba(0,161,222,0),#00A1DE 16%,#8fe6ff 50%,#00A1DE 84%,rgba(0,161,222,0));box-shadow:0 0 10px rgba(0,161,222,.7);pointer-events:none}
+#play .pbot::after{content:"";position:absolute;left:0;right:0;top:19px;bottom:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);pointer-events:none;z-index:-1}
+html.feet #play .pbot .hint{display:block}
 .sprow.two{grid-template-columns:1fr auto auto;gap:6px}.sprow.two .spbtn{min-width:82px;font-size:16px;padding:0 9px}
 .sp2opt{display:grid;gap:2px;text-align:left;width:100%;margin:6px 0;cursor:pointer;color:inherit;font:inherit}.sp2opt b{font-size:17px;color:#ffd23f}
 .avprev.av2{position:sticky;top:-2px;z-index:3;align-items:center;justify-content:space-between;gap:6px;padding:6px}
@@ -7073,7 +7077,7 @@ const ANI_B={
 const aniFem=L=>L.sex?/^(f|w|여)/i.test(L.sex):['pony','bob','twin','long','bun','wave'].includes(L.hair);
 function aniBody(L){const b={...(ANI_B[L.body]||ANI_B.std)};b.kid=L.body==='kid';b.old=L.body==='elder';
   if(aniFem(L)){b.fem=1;b.sh*=.86;b.wa*=.8;b.hp*=1.04;b.ar*=.82;b.lg*=.93;b.T*=.96;b.hd*=1.03;}
-  b.hr=6.4*b.hd;b.hip=b.hp*.5;b.head=.07+.84*b.hd;return b;}
+  b.hr=6.4*b.hd;b.hip=b.hp*.5;b.head=.25+.84*b.hd;return b;}
 const aLp=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
 const aShade=c=>mixc(c,'#2a1f58',.3);
 // 굵기가 변하는 매끈한 관(팔 · 다리 · 소매)
@@ -7091,7 +7095,7 @@ function aLine(A,fn,w,al=1,col){const g=A.g;g.save();g.globalAlpha=al;g.beginPat
 
 /* ----- 몸 ----- */
 function aLeg(A,hj,k,f,sd){const lg=A.B.lg,g=A.g;const an=[f[0],f[1]-4.4];
-  aCel(A,g=>aTube(g,[hj,aLp(hj,k,.5),k,aLp(k,an,.36),an],[lg*1.22,lg*1.08,lg*.74,lg*.9,lg*.46]),A.skin);
+  aCel(A,g=>aTube(g,[hj,aLp(hj,k,.48),k,aLp(k,an,.3),an],[lg*1.2,lg*1.12,lg*.8,lg*.98,lg*.5]),A.skin);
   // 무릎 · 종아리 선
   if(A.back){aLine(A,g=>{const c=aLp(k,an,.34);g.moveTo(c[0]-lg*.2,c[1]-lg*.9);g.quadraticCurveTo(c[0]+sd*lg*.3,c[1],c[0]-lg*.05,c[1]+lg*1.3);},.35,.45);}
   else aLine(A,g=>{g.moveTo(k[0]-lg*.42,k[1]+lg*.25);g.quadraticCurveTo(k[0],k[1]+lg*.6,k[0]+lg*.42,k[1]+lg*.25);},.35,.5);
@@ -7101,18 +7105,21 @@ function aLeg(A,hj,k,f,sd){const lg=A.B.lg,g=A.g;const an=[f[0],f[1]-4.4];
   aCel(A,g=>{g.rect(x-w-.35,y-1.6,w*2+.7,2.1);up(g);},'#f4f5fa',{d:0});aCel(A,up,A.shoe,{ink:0,d:.9});aLine(A,g=>{g.moveTo(x-w,y-1.5);g.lineTo(x+w,y-1.5);},.4,.9);
   if(!A.back){aLine(A,g=>{g.moveTo(x-w*.5,y-h+1.4);g.lineTo(x+w*.5,y-h+1.4);g.moveTo(x-w*.55,y-h+2.6);g.lineTo(x+w*.55,y-h+2.6);},.4,.9,'#f4f5fa');}
   else aLine(A,g=>{g.moveTo(x,y-h+.2);g.lineTo(x,y-2);},.5,.8,'#f4f5fa');}
-function aShorts(A){const {K,B,g}=A,lg=B.lg,hx=K.hipX,hy=K.hipY;const hem=(hj,k,sd)=>{const c=aLp(hj,k,.56),d=[k[0]-hj[0],k[1]-hj[1]],m=Math.hypot(d[0],d[1])||1,n=[-d[1]/m,d[0]/m];const w=lg*1.62;return [[c[0]+n[0]*w*sd,c[1]+n[1]*w*sd],[c[0]-n[0]*w*.92*sd,c[1]-n[1]*w*.92*sd]];};
-  const Lh=hem(K.hL,K.kL,1),Rh=hem(K.hR,K.kR,-1);const lo=Lh[0][0]<Lh[1][0]?Lh:[Lh[1],Lh[0]],ro=Rh[0][0]>Rh[1][0]?Rh:[Rh[1],Rh[0]];const ww=B.hp+(B.belly?1.6:.3),ty=hy-6.5;
-  const fn=g=>{g.moveTo(hx-ww,ty);g.quadraticCurveTo(hx-ww-1.2,hy+2,lo[0][0],lo[0][1]);g.lineTo(lo[1][0],lo[1][1]);g.quadraticCurveTo(hx-.6,hy+lg*.5,hx,hy+lg*.95);g.quadraticCurveTo(hx+.6,hy+lg*.5,ro[1][0],ro[1][1]);g.lineTo(ro[0][0],ro[0][1]);g.quadraticCurveTo(hx+ww+1.2,hy+2,hx+ww,ty);g.closePath();};
-  aCel(A,fn,A.shorts);aLine(A,g=>{g.moveTo(hx,hy-2);g.lineTo(hx,hy+lg*.85);},.35,.5);
-  g.save();g.beginPath();fn(g);g.clip();aLine(A,g=>{g.moveTo(hx-ww-.2,ty);g.quadraticCurveTo(hx-ww-1,hy+2,lo[0][0]+.9,lo[0][1]);g.moveTo(hx+ww+.2,ty);g.quadraticCurveTo(hx+ww+1,hy+2,ro[0][0]-.9,ro[0][1]);},1.5,.95,A.jersey);g.restore();}
+function aShorts(A){const {K,B,g}=A,lg=B.lg,hx=K.hipX,hy=K.hipY,ww=B.hp+(B.belly?1.6:.4),ty=hy-6.5,r=lg*1.32;
+  const leg=(hj,k)=>g=>aTube(g,[[hj[0],hj[1]-1],aLp(hj,k,.28),aLp(hj,k,.55)],[r,r*1.03,r*1.02],1);
+  const fn=g=>{g.moveTo(hx+ww,ty);g.lineTo(hx-ww,ty);g.quadraticCurveTo(hx-ww-.9,hy,K.hL[0]-r*.96,hy+2.5);g.lineTo(hx,hy+lg);g.lineTo(K.hR[0]+r*.96,hy+2.5);g.quadraticCurveTo(hx+ww+.9,hy,hx+ww,ty);g.closePath();leg(K.hL,K.kL)(g);leg(K.hR,K.kR)(g);};
+  aCel(A,fn,A.shorts);aLine(A,g=>{g.moveTo(hx,hy-2.5);g.lineTo(hx,hy+lg*.9);},.35,.5);
+  g.save();g.beginPath();fn(g);g.clip();for(const [hj,k,sd] of [[K.hL,K.kL,-1],[K.hR,K.kR,1]]){const c=aLp(hj,k,.58),d=[k[0]-hj[0],k[1]-hj[1]],m=Math.hypot(d[0],d[1])||1;let n=[-d[1]/m,d[0]/m];if(n[0]*sd<0)n=[-n[0],-n[1]];
+    aLine(A,g=>{g.moveTo(hx+sd*(ww-.4),ty);g.quadraticCurveTo(hx+sd*(ww+.6),hy+1,c[0]+n[0]*(r-.9),c[1]+n[1]*(r-.9));},1.3,.95,A.jersey);}g.restore();
+  for(const [hj,k] of [[K.hL,K.kL],[K.hR,K.kR]])aLine(A,g=>{const a=aLp(hj,k,.5),d=[k[0]-hj[0],k[1]-hj[1]],m=Math.hypot(d[0],d[1])||1,n=[-d[1]/m*r*.8,d[0]/m*r*.8];g.moveTo(a[0]-n[0],a[1]-n[1]);g.lineTo(a[0]+n[0],a[1]+n[1]);},.3,.35);}
 function aTorsoPath(g,A){const {K,B}=A,sx=K.shX,sy=K.shY,hx=K.hipX,hy=K.hipY,nk=B.fem?2.5:3.1;const wy=sy+(hy-sy)*.62,hemY=hy-1.2,hw=B.hp+(B.belly?1.8:B.fem?.5:.2),wa=B.wa,ar=B.ar,sL=K.sL,sR=K.sR,bl=B.belly?2.2:0;
   g.moveTo(sx-nk,sy-1.7);g.quadraticCurveTo((sx+sL[0])/2-1,sy-1.5,sL[0]-ar*.45,sL[1]-ar*.8);g.quadraticCurveTo(sL[0]-ar*.1,sL[1]+ar*1.3,sL[0]+ar*.5,sy+7.5);
   g.bezierCurveTo(sL[0]+ar*.55-bl,sy+14,hx-wa-bl,wy-5,hx-wa-bl*.6,wy);g.quadraticCurveTo(hx-wa-bl*.4,hemY-3,hx-hw,hemY);g.quadraticCurveTo(hx,hemY+1.8+bl*.5,hx+hw,hemY);
   g.quadraticCurveTo(hx+wa+bl*.4,hemY-3,hx+wa+bl*.6,wy);g.bezierCurveTo(hx+wa+bl,wy-5,sR[0]-ar*.55+bl,sy+14,sR[0]-ar*.5,sy+7.5);g.quadraticCurveTo(sR[0]+ar*.1,sR[1]+ar*1.3,sR[0]+ar*.45,sR[1]-ar*.8);g.quadraticCurveTo((sx+sR[0])/2+1,sy-1.5,sx+nk,sy-1.7);g.closePath();}
-function aJersey(A){const {K,B,g,L}=A,ar=B.ar,sx=K.shX,sy=K.shY,nk=B.fem?2.5:3.1;const sl=(s,e)=>g=>aTube(g,[s,aLp(s,e,.58)],[ar*1.42+.4,ar*1.42+.7],1);
+function aJersey(A){const {K,B,g,L}=A,ar=B.ar,sx=K.shX,sy=K.shY,nk=B.fem?2.5:3.1;const sl=(s,e)=>g=>aTube(g,[s,aLp(s,e,.25),aLp(s,e,.5)],[ar*1.2+.7,ar*1.3+.6,ar*1.22+.75],1);
   aCel(A,g=>{aTorsoPath(g,A);sl(K.sL,K.eL)(g);sl(K.sR,K.eR)(g);},A.jersey,{d:1.5});
-  for(const [s,e] of [[K.sL,K.eL],[K.sR,K.eR]])aCel(A,g=>aTube(g,[aLp(s,e,.5),aLp(s,e,.6)],[ar*1.42+.65,ar*1.42+.75],2),A.trim,{d:.5});
+  for(const [s,e] of [[K.sL,K.eL],[K.sR,K.eR]])aCel(A,g=>aTube(g,[aLp(s,e,.43),aLp(s,e,.52)],[ar*1.24+.72,ar*1.22+.8],2),A.trim,{d:.5});
+  aLine(A,g=>{g.moveTo(sx-nk-.8,sy-1.2);g.quadraticCurveTo(K.sL[0]+ar*.9,sy+2.5,K.sL[0]+ar*.55,sy+7);g.moveTo(sx+nk+.8,sy-1.2);g.quadraticCurveTo(K.sR[0]-ar*.9,sy+2.5,K.sR[0]-ar*.55,sy+7);},.3,.3);
   const cx=(sx+K.hipX)/2,cy=sy+(K.hipY-sy)*.5;
   if(A.back){aLine(A,g=>{g.moveTo(sx,sy+4);g.quadraticCurveTo(cx+.4,cy,K.hipX,K.hipY-5);},.4,.22);
     aLine(A,g=>{g.moveTo(sx-nk-.6,sy-1.6);g.quadraticCurveTo(sx,sy+.4,sx+nk+.6,sy-1.6);},2.9,1);aLine(A,g=>{g.moveTo(sx-nk-.4,sy-1.6);g.quadraticCurveTo(sx,sy+.4,sx+nk+.4,sy-1.6);},1.7,1,A.trim);}
@@ -7120,14 +7127,14 @@ function aJersey(A){const {K,B,g,L}=A,ar=B.ar,sx=K.shX,sy=K.shY,nk=B.fem?2.5:3.1
     aLine(A,g=>{g.moveTo(sx-nk-.3,sy-1.9);g.lineTo(sx,sy+3.4);g.lineTo(sx+nk+.3,sy-1.9);},2.6,1);aLine(A,g=>{g.moveTo(sx-nk-.3,sy-1.9);g.lineTo(sx,sy+3.4);g.lineTo(sx+nk+.3,sy-1.9);},1.4,1,A.trim);}
   // 등번호
   const n=L.num;if(n){g.save();g.translate(cx,cy+(A.back?-.5:-3));g.rotate(Math.atan2(K.hipX-sx,K.hipY-sy)*-.8);g.scale(A.mir?-1:1,1);const fs=A.back?B.T*.34:B.T*.17;if(!A.back)g.translate(B.wa*.45,0);g.font=`italic 900 ${fs}px "Arial Black",Arial,sans-serif`;g.textAlign='center';g.textBaseline='middle';g.lineWidth=fs*.16;g.strokeStyle=aShade(A.jersey);g.strokeText(n,0,0);g.fillStyle='#fdfdff';g.fillText(n,0,0);if(A.back&&A.u.sp){g.font=`900 ${fs*.3}px Arial,sans-serif`;g.fillText(String(A.u.sp).slice(0,9).toUpperCase(),0,-fs*.78);}g.restore();}}
-function aArm(A,s,e,h,rk,cut){const ar=A.B.ar,g=A.g;const d=[h[0]-e[0],h[1]-e[1]],m=Math.hypot(d[0],d[1])||1,u=[d[0]/m,d[1]/m],hc=[h[0]+u[0]*1.2,h[1]+u[1]*1.2],hr2=2.3+ar*.3;
+function aArm(A,s,e,h,rk,cut){const ar=A.B.ar,g=A.g;const d=[h[0]-e[0],h[1]-e[1]],m=Math.hypot(d[0],d[1])||1,u=[d[0]/m,d[1]/m],hc=[h[0]+u[0]*1.3,h[1]+u[1]*1.3],hr2=1.85+ar*.3;
   if(rk){const p=A.P.p||[.45,-1],pm=Math.hypot(p[0],p[1])||1,q=[p[0]/pm,p[1]/pm],bc=[hc[0]+q[0]*10.2,hc[1]+q[1]*10.2],an=Math.atan2(q[1],q[0]);
     aCel(A,g=>aTube(g,[hc,[hc[0]+q[0]*5,hc[1]+q[1]*5]],[1,1.25]),'#d9a866',{d:.5});
     const red=A.back?!!A.P.rb:!A.P.rb;aCel(A,g=>{g.ellipse(bc[0],bc[1],6.1,5.5,an,0,7);},red?A.pad:'#2a2833',{d:1});aLine(A,g=>{g.ellipse(bc[0],bc[1],4.4,3.9,an,3.6,5.2);},.5,.35,'#ffffff');}
-  if(cut)aCel(A,g=>aTube(g,[aLp(s,e,.52),e,aLp(e,h,.36),h],[ar*1.1,ar*.86,ar*.94,ar*.68]),A.skin);
+  if(cut)aCel(A,g=>aTube(g,[aLp(s,e,.46),e,aLp(e,h,.36),h],[ar*1.1,ar*.86,ar*.94,ar*.68]),A.skin);
   else aCel(A,g=>aTube(g,[s,aLp(s,e,.5),e,aLp(e,h,.36),h],[ar*1.12,ar*1.1,ar*.86,ar*.94,ar*.68]),A.skin);
-  if(rk&&A.L.wb)aCel(A,g=>aTube(g,[aLp(e,h,.8),aLp(e,h,.95)],[ar*.82,ar*.78]),'#f4f6ff',{d:.5});
-  aCel(A,g=>{g.arc(hc[0],hc[1],hr2,0,7);},A.skin,{d:.8});aLine(A,g=>{g.moveTo(hc[0]-u[1]*hr2*.5,hc[1]+u[0]*hr2*.5);g.lineTo(hc[0]-u[1]*hr2*.5+u[0]*hr2*.7,hc[1]+u[0]*hr2*.5+u[1]*hr2*.7);g.moveTo(hc[0],hc[1]);g.lineTo(hc[0]+u[0]*hr2*.8,hc[1]+u[1]*hr2*.8);},.3,.5);}
+  if(rk&&A.L.wb)aCel(A,g=>aTube(g,[aLp(e,h,.8),aLp(e,h,.93)],[ar*.8,ar*.76],2),'#f4f6ff',{d:.4});
+  {const an=Math.atan2(u[1],u[0]);aCel(A,g=>{g.ellipse(hc[0],hc[1],hr2*1.2,hr2*.92,an,0,7);g.moveTo(hc[0]-u[1]*hr2*.8+hr2*.5,hc[1]+u[0]*hr2*.8);g.arc(hc[0]-u[1]*hr2*.8-u[0]*hr2*.1,hc[1]+u[0]*hr2*.8-u[1]*hr2*.1,hr2*.45,0,7);},A.skin,{d:.7});}aLine(A,g=>{g.moveTo(hc[0]-u[1]*hr2*.5,hc[1]+u[0]*hr2*.5);g.lineTo(hc[0]-u[1]*hr2*.5+u[0]*hr2*.7,hc[1]+u[0]*hr2*.5+u[1]*hr2*.7);g.moveTo(hc[0],hc[1]);g.lineTo(hc[0]+u[0]*hr2*.8,hc[1]+u[1]*hr2*.8);},.3,.5);}
 
 /* ----- 머리카락 ----- */
 const ANI_HAIR={sports:{c:1.07,bang:'swept'},side:{c:1.07,bang:'part'},under:{c:1.09,bang:'swept',under:1},spiky:{c:1.06,bang:'spike',sp:.2},bowl:{c:1.1,bang:'flat'},
@@ -7209,6 +7216,7 @@ function aniDraw(g,def,P,view,s,ox,oy,opt={}){const L=def.look,u=def.uni||{},B=a
     sock:SOCK_C[L.sockC|0]||'#f4f5fa',shoe:SHOE_C[L.shoeC|0]||'#c8283a',pad:PAD_C[L.pc|0]||'#d8283a'};
   // 정면 · 후면에서는 무릎이 옆으로 벌어지지 않게 다리 선 쪽으로 당김 (굽힘은 다리 길이로 표현)
   for(const [h,k,f] of [['hL','kL','fL'],['hR','kR','fR']]){const H=K[h],F=K[f],N=K[k],d=[F[0]-H[0],F[1]-H[1]],m2=d[0]*d[0]+d[1]*d[1]||1,t=((N[0]-H[0])*d[0]+(N[1]-H[1])*d[1])/m2;K[k]=aLp(N,[H[0]+d[0]*t,H[1]+d[1]*t],.62);}
+  {const e0=K.eL[0],t=.7;K.eL=[K.sL[0]+(e0-K.sL[0])*t,K.eL[1]];K.hLl=[K.eL[0]+(K.hLl[0]-e0)*t,K.hLl[1]];}
   if(opt.bust)opt={...opt,at:[opt.bust/2,opt.bust*.4]};if(opt.at){ox=opt.at[0]-K.head[0]*s*(mir?-1:1);oy=opt.at[1]-K.head[1]*s;}
   g.save();g.translate(ox,oy);g.scale(mir?-s:s,s);g.lineJoin='round';g.lineCap='round';
   const ex=opt.expr||P.e||'normal',neck=()=>aCel(A,g=>aTube(g,[[K.shX,K.shY+1],[K.head[0],K.head[1]+B.hr*.75]],[B.fem?2.2:B.kid?2:2.9,B.fem?2:B.kid?1.9:2.7]),A.skin,{sh:A.skinS});
@@ -7216,7 +7224,7 @@ function aniDraw(g,def,P,view,s,ox,oy,opt={}){const L=def.look,u=def.uni||{},B=a
   aLeg(A,K.hL,K.kL,K.fL,-1);aLeg(A,K.hR,K.kR,K.fR,1);aShorts(A);
   if(back){aArm(A,K.sL,K.eL,K.hLl,0);aArm(A,K.sR,K.eR,K.hRr,1);neck();aJersey(A);aHead(A,ex);}
   else{neck();aJersey(A);aHead(A,ex);aArm(A,K.sL,K.eL,K.hLl,0,1);aArm(A,K.sR,K.eR,K.hRr,1,1);
-    for(const [s0,e0] of [[K.sL,K.eL],[K.sR,K.eR]])aCel(A,g=>aTube(g,[aLp(s0,e0,.5),aLp(s0,e0,.6)],[B.ar*1.42+.65,B.ar*1.42+.75],2),A.trim,{d:.5});}
+    for(const [s0,e0] of [[K.sL,K.eL],[K.sR,K.eR]])aCel(A,g=>aTube(g,[aLp(s0,e0,.43),aLp(s0,e0,.52)],[B.ar*1.24+.72,B.ar*1.22+.8],2),A.trim,{d:.5});}
   g.restore();return K;}
 function aniPortrait(look,uni,expr='normal',N=128){const c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d');const B=aniBody(look);aniDraw(g,{look,uni,hand:'R'},{...RDY2,R:[4,12,2,22],L:[-4,12,-2,22]},'front',N/(B.hr*3.9),0,0,{bust:N,expr});return c;}
 
@@ -7238,9 +7246,9 @@ function aGear(A,H){const k=A.L.gear,back=A.back,c=H.c||1.03;if(!k||k==='none')r
 
 /* ----- 게임 연결: 경기 프레임 굽기 · 초상 · 카드/장면 · 컷인 ----- */
 const ANI_ON=true;const aniStand=B=>B.L+B.T+3.2+B.hr*2.2;
-function aniBake(def,view,sk,pose,bl){const z=PXR_SZ[sk],B=aniBody(def.look),s=z.tgt/aniStand(B);const [c,g]=cvs(z.w,z.h);const mir=(view==='front')!==(def.hand==='L');
+function aniBake(def,view,sk,pose,bl){const z=PXR_SZ[sk],B=aniBody(def.look),s=z.tgt/aniStand(B);const sk2=z.w+'x'+z.h;let c=ANI_SCR[sk2];if(!c){c=ANI_SCR[sk2]=document.createElement('canvas');c.width=z.w;c.height=z.h;}const g=c.getContext('2d',{willReadFrequently:true});g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,z.w,z.h);const mir=(view==='front')!==(def.hand==='L');
   const K=aniDraw(g,def,pose,view,s,z.w/2,z.fy,bl?{expr:'blink'}:{});const N=pt=>[z.w/2+(mir?-1:1)*pt[0]*s,z.fy+pt[1]*s];return {img:c,w:z.w,h:z.h,fy:z.fy,lh:N(K.hLl),rh:N(K.hRr)};}
-try{DOT.frac=1;}catch(e){}
+const ANI_SCR={};try{DOT.frac=.85;DOT.cap=64e6;}catch(e){}
 const ANI_POR=new Map();
 {const _pp=pixPortrait;pixPortrait=function(look,uni,expr='normal',N=64){const key=JSON.stringify([look,uni,expr,N]);let c=ANI_POR.get(key);if(c)return c;
     try{c=aniPortrait(look,uni,expr==='special'?'fire':expr,N);}catch(e){try{diagLog(e,'ani-por');}catch(_){}return _pp.apply(this,arguments);}
@@ -7264,17 +7272,26 @@ function aniScene(info,scene,f,k,W0=180,H0=252){const W=W0*k,H=H0*k;const [c,g]=
   pxSceneNative=function(info,scene='card',f=0){try{const z=size(info,scene);return aniScene(info,scene,f,1,z[0],z[1]);}catch(e){try{diagLog(e,'ani-scene');}catch(_){}return _sn.apply(this,arguments);}};
   const _il=pxIllust;pxIllust=function(info,scene,f=0){try{const key=pxKey(info,scene,f);let c=PX_CACHE.get(key);if(c){PX_CACHE.delete(key);PX_CACHE.set(key,c);return c;}
       const z=size(info,scene);c=aniScene(info,scene,f,2,z[0],z[1]);if(scene==='card'){const g=c.getContext('2d');g.save();g.scale(2,2);pxFrame(g,info);g.restore();}
-      PX_CACHE.set(key,c);while(PX_CACHE.size>90)PX_CACHE.delete(PX_CACHE.keys().next().value);return c;}catch(e){try{diagLog(e,'ani-ill');}catch(_){}return _il.apply(this,arguments);}};
+      PX_CACHE.set(key,c);while(PX_CACHE.size>36)PX_CACHE.delete(PX_CACHE.keys().next().value);return c;}catch(e){try{diagLog(e,'ani-ill');}catch(_){}return _il.apply(this,arguments);}};
   const _pc=pxCutin;pxCutin=function(info,f=0,ppl=null){const o=_pc.apply(this,arguments);try{const W=o.width,H=o.height;const [c,g]=cvs(W,H);const sc=(typeof STYLE_COL!=='undefined'&&STYLE_COL[info.style])||'#3ad0e0';
       const gr=g.createLinearGradient(0,0,W,0);gr.addColorStop(0,mixc(sc,'#06102a',.7));gr.addColorStop(1,mixc(sc,'#ffffff',.15));g.fillStyle=gr;g.fillRect(0,0,W,H);
       g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=1;for(let i=0;i<16;i++){const y=(i*29+f*13)%H,x=(i*71+f*37)%W;g.beginPath();g.moveTo(x,y);g.lineTo(x+W*.22,y);g.stroke();}
       const B=aniBody(info.look);aniDraw(g,{look:info.look,uni:info.uni,hand:info.hand||'R'},{...RDY2,lean:-2},'front',H*1.05/B.hr,0,0,{expr:'fire',at:[W*.62+f,H*.34]});
       if(ppl)g.drawImage(o,0,Math.round(H*.76),Math.round(W*.34),Math.round(H*.24),0,Math.round(H*.76),Math.round(W*.34),Math.round(H*.24));return c;}catch(e){try{diagLog(e,'ani-cut');}catch(_){}return o;}};}
 
+/* ----- 생성 선수는 경기 중 이벤트 컷을 쓰지 않음 (에이스 전용 일러스트 연출과 섞이지 않게) -----
+   필살기는 코트 위 효과와 이름 표시로, 게임 획득은 코트 위 세리머니로 대신함 */
+const aniGen=()=>!!(M&&M.pl&&!M.pl.ace);
+{const _pc2=playCut;playCut=function(panels,done){if(!panels||!panels.length||!panels[0]){try{done&&done();}catch(e){}return;}return _pc2.apply(this,arguments);};
+  const _cl=cutCloseup;cutCloseup=function(who,uni,expr,name,line,mine,oi){if(mine&&aniGen())return null;return _cl.apply(this,arguments);};
+  const _cs=cutSpecial;cutSpecial=function(){if(aniGen()){try{const k=M.spKind&&SPECIALS[M.spKind]?M.spKind:M.pl.special;sfx('special');M.shake=.45;addPop(M.pops,spName(M.pl,k)+'!',80,150,'#ffd23f');}catch(e){}return null;}return _cs.apply(this,arguments);};
+  const _ce=celebSrc;celebSrc=function(){if(aniGen())return null;return _ce.apply(this,arguments);};
+  const _cr=cutResult;cutResult=function(){if(aniGen())return null;return _cr.apply(this,arguments);};}
+
 </script>
 
   <script>
-  if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611132340').catch(()=>{});});}
+  if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=202611140922').catch(()=>{});});}
   // 설치형 앱에서 화면 꺼짐 방지(경기 중) · 뒤로가기 실수 방지
   try{if('wakeLock' in navigator)document.addEventListener('pointerdown',function w(){navigator.wakeLock.request('screen').catch(()=>{});document.removeEventListener('pointerdown',w);});}catch(e){}
   </script>
